@@ -140,7 +140,6 @@
 					<table class="table table-bordered table-hover">
 						<thead>
 						<tr>
-							<td style="width: 1px;" class="text-center"><input type="checkbox" onclick="$('input[name*=\'selected\']').prop('checked', this.checked);" /></td>
 							<td class="text-center"><?php echo $column_image; ?></td>
 							<td class="text-left"><?php if ($sort == 'pd.name') { ?>
 								<a href="<?php echo $sort_name; ?>" class="<?php echo strtolower($order); ?>"><?php echo $column_name; ?></a>
@@ -158,12 +157,13 @@
 								<a href="<?php echo $sort_price; ?>"><?php echo $column_price; ?></a>
 								<?php } ?></td>
 							<td class="text-left"><?php echo $column_category; ?></td>
-							<td class="text-right"><?php if ($sort == 'p.quantity') { ?>
+							<td class="text-left"><?php echo $column_options; ?></td>
+							<td class="text-right column_quantity"><?php if ($sort == 'p.quantity') { ?>
 								<a href="<?php echo $sort_quantity; ?>" class="<?php echo strtolower($order); ?>"><?php echo $column_quantity; ?></a>
 								<?php } else { ?>
 								<a href="<?php echo $sort_quantity; ?>"><?php echo $column_quantity; ?></a>
 								<?php } ?></td>
-							<td class="text-left"><?php if ($sort == 'p.status') { ?>
+							<td class="text-left column_status"><?php if ($sort == 'p.status') { ?>
 								<a href="<?php echo $sort_status; ?>" class="<?php echo strtolower($order); ?>"><?php echo $column_status; ?></a>
 								<?php } else { ?>
 								<a href="<?php echo $sort_status; ?>"><?php echo $column_status; ?></a>
@@ -175,11 +175,6 @@
 						<?php if ($products) { ?>
 						<?php foreach ($products as $product) { ?>
 						<tr>
-							<td class="text-center"><?php if (in_array($product['product_id'], $selected)) { ?>
-								<input type="checkbox" name="selected[]" value="<?php echo $product['product_id']; ?>" checked="checked" />
-								<?php } else { ?>
-								<input type="checkbox" name="selected[]" value="<?php echo $product['product_id']; ?>" />
-								<?php } ?></td>
 							<td class="text-center"><?php if ($product['image']) { ?>
 								<img src="<?php echo $product['image']; ?>" alt="<?php echo $product['name']; ?>" class="img-thumbnail" />
 								<?php } else { ?>
@@ -208,15 +203,17 @@
 								<?php echo $category['name'];?><br>
 								<?php } ?>
 								<?php } ?></td>
-
-							<td class="text-right"><?php if ($product['quantity'] <= 0) { ?>
+							<td class="text-center" id="option_product_<?php echo $product['product_id'] ?>">
+								<button type="button" name="options_<?php echo $product['product_id'] ?>" data-toggle="tooltip" title="<?php echo $entry_options_button; ?>" class="btn btn-primary options_button"><i class="fa fa-plus-square"></i></button>
+							</td>
+							<td class="text-right column_quantity"><?php if ($product['quantity'] <= 0) { ?>
 								<span class="label label-warning"><?php echo $product['quantity']; ?></span>
 								<?php } elseif ($product['quantity'] <= 5) { ?>
 								<span class="label label-danger"><?php echo $product['quantity']; ?></span>
 								<?php } else { ?>
 								<span class="label label-success"><?php echo $product['quantity']; ?></span>
 								<?php } ?></td>
-							<td class="text-left"><?php echo $product['status']; ?></td>
+							<td class="text-left column_status"><?php echo $product['status']; ?></td>
 							<td class="text-right">
 								<button type="button" name="<?php echo $product['product_id'] ?>" data-toggle="tooltip" title="<?php echo $entry_save; ?>" class="btn btn-primary save_button"><i class="fa fa-save"></i></button>
 								<a href="<?php echo $product['edit']; ?>" data-toggle="tooltip" title="<?php echo $entry_edit_product; ?>" class="btn btn-primary"><i class="fa fa-pencil"></i></a></td>
@@ -285,12 +282,94 @@
 	);
 
 
+
+	var product_id_option_open= [];
+	$('.table-responsive').on('click', '.options_button', handler);
+	function handler()
+		{
+			var product_id=$(this).attr('name').replace('options_', '');
+			if (typeof product_id_option_open[product_id] != "undefined") {
+				showOrHide(product_id)
+			} else {
+				renderOptions(product_id);
+			}
+
+
+
+		}
+	function showOrHide(product_id) {
+		switch(product_id_option_open[product_id]) {
+			case 'show':
+				$("#option_product_" + product_id + ' .options_product_sub_block').hide();
+				product_id_option_open[product_id] = 'hide';
+				break;
+			case 'hide':
+				$("#option_product_" + product_id + ' .options_product_sub_block').show();
+				product_id_option_open[product_id] = 'show';
+				$('.column_quantity').hide();
+				$('.column_status').hide();
+				//alert("s_h " + product_id_option_open[product_id] + 'show');
+				break;
+		}
+		if(product_id_option_open.indexOf('show') == -1) {
+
+			$('.column_quantity').show();
+			$('.column_status').show();
+		}
+	}
+
+	function renderOptions(product_id) {
+		product_id_option_open[product_id] = 'show';
+		$.ajax({
+			url: 'index.php?route=extension/module/massive_change_in_price_bobs/options&token=<?php echo $token; ?>&product_id=' + product_id,
+			dataType: 'json',
+			success: function (json) {
+				//hide column table
+				$('.column_quantity').hide();
+				$('.column_status').hide();
+				var options_sub = '<div class="options_product_sub_block">';
+				if(json.length)
+				{
+					//alert('dsfs' + json);
+					for (i = 0; i < json.length; i++) {
+						//alert('555');
+						if(json[i]['options']) {
+							var options = '<div class="text-left"><strong>' + json[i]['name'] +": " + '</strong></div>';
+							for (isub = 0; isub < json[i]['options'].length; isub++) {
+								options +='<div class="row text-left">';
+								options +='<div class="col-sm-6">';
+								options +=json[i]['options'][isub]['name'] + ' ' + json[i]['options'][isub]['price_prefix'];
+								options +='</div>';
+								options +='<div class="col-sm-6">';
+								options +='<input type="text" name="product_option_value_id_' + json[i]['options'][isub]['product_option_value_id'] + '" value="' + json[i]['options'][isub]['price'] + '" class="form-control" />'
+								options +='</div>';
+								options +='</div>';
+							}
+						} else {
+							var options = '<div class="text-left"><strong>' + json[i]['name'] + "</strong>: ";
+							options +='<?php echo $attentions_no_options_price; ?>';
+							options +='</div>';
+						}
+
+						options_sub += options;
+						//alert(options);
+					}
+				} else {
+					$("#option_product_" + product_id).append('<div class="text-left"><?php echo $attentions_no_options; ?></div>');
+				}
+				options_sub += '</div>';
+				$("#option_product_" + product_id).append(options_sub);
+			}
+		});
+	}
+
 	$('.save_button').click(function()
 		{
 			var product_id=$(this).attr('name');
 			var price=$('[name = "price_' + product_id + '"]').val();
+
 			$.ajax({
-				url: 'index.php?route=extension/module/massive_change_in_price_bobs/save&token=<?php echo $token; ?>&product_id=' + product_id + '&price=' + price,
+				url: 'index.php?route=extension/module/massive_change_in_price_bobs/save&token=<?php echo $token; ?>&product_id=' + product_id + '&price=' + price + optionUrl(product_id),
 				dataType: 'json',
 				success: function(json) {
 					//alert(price+"p"+product_id);
@@ -299,6 +378,15 @@
 			});
 		}
 	);
+	function optionUrl(product_id)
+	{
+		var url = "";
+		$("#option_product_" + product_id + " .form-control").each(function(i,elem) {
+			url += '&' + $(this).attr('name') + "=" + $(this).val();
+			//alert(url);
+		});
+		return url;
+	}
 	//--></script>
 
 <script type="text/javascript"><!--
