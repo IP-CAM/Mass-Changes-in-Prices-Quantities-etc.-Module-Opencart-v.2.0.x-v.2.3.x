@@ -3,7 +3,7 @@
 <div class="page-header">
 	<div class="container-fluid">
 		<div class="pull-right">
-			<button type="submit" form="form-product" formaction="<?php echo $action; ?>" data-toggle="tooltip" title="<?php echo $button_save; ?>" class="btn btn-primary"><i class="fa fa-save"></i></button>
+			<button type="submit" form="form-product" data-toggle="tooltip" title="<?php echo $button_save; ?>" class="btn btn-primary"><i class="fa fa-save"></i></button>
 			<a href="<?php echo $cancel; ?>" data-toggle="tooltip" title="<?php echo $button_cancel; ?>" class="btn btn-default"><i class="fa fa-reply"></i></a>
 		</div>
 		<h1><?php echo $heading_title; ?></h1>
@@ -20,10 +20,10 @@
 		<button type="button" class="close" data-dismiss="alert">&times;</button>
 	</div>
 	<?php } ?>
-	<?php if ($attentions) { ?>
-	<div class="alert alert-attentions"><i class="fa fa-exclamation-circle"></i> <?php echo $attentions; ?>
-		<button type="button" class="close" data-dismiss="alert">&times;</button>
-	</div>
+	<?php if ($info) { ?>
+		<div class="alert alert-info">
+			<p><i class="fa fa-info-circle"></i> <?php echo $info; ?></p>
+		</div>
 	<?php } ?>
 
 	<div class="panel panel-default">
@@ -106,30 +106,22 @@
 				</div>
 			</div>
 
-			<div class="well">
-				<div class="row form-group">
-					<div class="col-sm-8">
-						<input type="text" name="base_price_factor" value="<?php echo $base_price_factor; ?>" placeholder="<?php echo $help_base_price_factor; ?>" id="input-price" class="form-control" />
-					</div>
-					<div class="col-sm-1">
-						<button name="base_price_factor_button" data-toggle="tooltip" title="<?php echo $help_base_price_factor_button; ?>" class="btn btn-primary"><i class="fa fa-hand-o-up"></i></button>
-					</div>
-					<div class="col-sm-3">
-						<span><?php echo $help_base_price_factor; ?></span>
+			<form action="<?php echo $basePrice; ?>" method="post" id="form-base-price">
+				<div class="well">
+					<div class="row form-group">
+						<div class="col-sm-8">
+							<input type="text" name="base_price_factor" value="<?php echo $base_price_factor; ?>" placeholder="<?php echo $help_base_price; ?>" id="input-price" class="form-control" />
+						</div>
+						<div class="col-sm-1">
+							<button name="base_price_button" form="form-base-price"  data-toggle="tooltip" title="<?php echo $help_base_price_button; ?>" class="btn btn-primary"><i class="fa fa-hand-o-up"></i></button>
+						</div>
+						<div class="col-sm-3">
+							<span><?php echo $help_base_price; ?></span>
+						</div>
 					</div>
 				</div>
-			</div>
-
-			<form action="<?php echo $action; ?>" method="post" enctype="multipart/form-data" id="form-product">
-
-				<input id="filter_name_old" type="hidden" name="filter_name_old" value="<?php echo $filter_name ?>">
-				<input id="filter_model_old" type="hidden" name="filter_model_old" value="<?php echo $filter_model ?>">
-				<input id="filter_price_old" type="hidden" name="filter_price_old" value="<?php echo $filter_price ?>">
-				<input id="filter_quantity_old" type="hidden" name="filter_quantity_old" value="<?php echo $filter_quantity ?>">
-				<input id="filter_category_old" type="hidden" name="filter_category_old" value="<?php echo $filter_category ?>">
-				<input id="filter_status_old" type="hidden" name="filter_status_old" value="<?php echo $filter_status ?>">
-				<input id="filter_image_old" type="hidden" name="filter_image_old" value="<?php echo $filter_image ?>">
-
+			</form>
+			<form action="<?php echo $saveAll; ?>" method="post" id="form-product">
 
 				<div class="table-responsive">
 					<table class="table table-bordered table-hover">
@@ -177,8 +169,6 @@
 								<?php } ?></td>
 							<td class="text-left"><?php echo $product['name']; ?></td>
 							<td class="text-left"><?php echo $product['model']; ?></td>
-
-
 
 							<td class="text-right"><?php if ($product['special']) { ?>
 									<span><input type="text" name="price_<?php echo $product['product_id'] ?>" value="<?php echo $product['price']; ?>" placeholder="<?php echo $entry_price; ?>" id="input-price" class="form-control" /></span><br/>
@@ -231,51 +221,6 @@
 	</div>
 </div>
 <script type="text/javascript"><!--
-
-	function getFilter() {
-		var url = "";
-		if($('[name = "filter_name_old"]').val() != "")
-		{
-			url=url +'&filter_name=' + $('[name = "filter_name_old"]').val();
-		}
-		if($('[name = "filter_model_old"]').val() != "")
-		{
-			url=url + '&filter_model=' + $('[name = "filter_model_old"]').val();
-		}
-		if($('[name = "filter_price_old"]').val() != "")
-		{
-			url=url + '&filter_price=' + $('[name = "filter_price_old"]').val();
-		}
-		if($('[name = "filter_quantity_old"]').val() != "")
-		{
-			url=url + '&filter_quantity=' + $('[name = "filter_quantity_old"]').val();
-		}
-		if($('[name = "filter_category_old"]').val() != "")
-		{
-			url=url + '&filter_category=' + $('[name = "filter_category_old"]').val();
-		}
-		if($('[name = "filter_status_old"]').val() != "")
-		{
-			url=url + '&filter_status=' + $('[name = "filter_status_old"]').val();
-		}
-		if($('[name = "filter_image_old"]').val() != "")
-		{
-			url=url + '&filter_image=' + $('[name = "filter_image_old"]').val();
-		}
-
-		return url;
-
-	}
-
-
-	$('[name = "base_price_factor_button"]').click(function()
-		{
-			var base_price_factor=$('[name = "base_price_factor"]').val();
-			var url = 'index.php?route=extension/module/massive_change_in_price_bobs/help_base_price_factor&token=<?php echo $token; ?>&base_price_factor=' + base_price_factor + getFilter();
-			location = url;
-		}
-	);
-
 
 
 	var product_id_option_open= [];
