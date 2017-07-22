@@ -3,7 +3,7 @@
 <div class="page-header">
 	<div class="container-fluid">
 		<div class="pull-right">
-			<button type="submit" form="form-account" data-toggle="tooltip" title="<?php echo $button_save; ?>" class="btn btn-primary"><i class="fa fa-save"></i></button>
+			<button type="submit" form="form-product" formaction="<?php echo $action; ?>" data-toggle="tooltip" title="<?php echo $button_save; ?>" class="btn btn-primary"><i class="fa fa-save"></i></button>
 			<a href="<?php echo $cancel; ?>" data-toggle="tooltip" title="<?php echo $button_cancel; ?>" class="btn btn-default"><i class="fa fa-reply"></i></a>
 		</div>
 		<h1><?php echo $heading_title; ?></h1>
@@ -15,17 +15,12 @@
 	</div>
 </div>
 <div class="container-fluid">
-	<?php if ($error_warning) { ?>
-	<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> <?php echo $error_warning; ?>
-		<button type="button" class="close" data-dismiss="alert">&times;</button>
-	</div>
-	<?php } ?>
 	<?php if ($success) { ?>
 	<div class="alert alert-success"><i class="fa fa-check-circle"></i> <?php echo $success; ?>
 		<button type="button" class="close" data-dismiss="alert">&times;</button>
 	</div>
 	<?php } ?>
-	<?php if($attentions) { ?>
+	<?php if ($attentions) { ?>
 	<div class="alert alert-attentions"><i class="fa fa-exclamation-circle"></i> <?php echo $attentions; ?>
 		<button type="button" class="close" data-dismiss="alert">&times;</button>
 	</div>
@@ -125,7 +120,7 @@
 				</div>
 			</div>
 
-			<form action="<?php echo $action; ?>" method="post" id="form-product">
+			<form action="<?php echo $action; ?>" method="post" enctype="multipart/form-data" id="form-product">
 
 				<input id="filter_name_old" type="hidden" name="filter_name_old" value="<?php echo $filter_name ?>">
 				<input id="filter_model_old" type="hidden" name="filter_model_old" value="<?php echo $filter_model ?>">
