@@ -161,14 +161,21 @@
 						<tbody>
 						<?php if ($products) { ?>
 						<?php foreach ($products as $product) { ?>
-						<tr class="sfd">
+						<tr>
+
+
 							<td class="text-center"><?php if ($product['image']) { ?>
 								<img src="<?php echo $product['image']; ?>" alt="<?php echo $product['name']; ?>" class="img-thumbnail" />
 								<?php } else { ?>
 								<span class="img-thumbnail list"><i class="fa fa-camera fa-2x"></i></span>
 								<?php } ?></td>
+
+
 							<td class="text-left"><?php echo $product['name']; ?></td>
+
+
 							<td class="text-left"><?php echo $product['model']; ?></td>
+
 
 							<td class="text-left price_td">
 
@@ -181,8 +188,7 @@
 								<span class="old_price"
 									  style="display: none;"
 									  name="old_price_<?php echo $product['product_id'] ?>">
-									<?php echo $product['price']; ?></span></br>
-
+									<?php echo $product['price']; ?></span>
 
 								<?php if (!empty($product['special'])) { ?>
 								<div class="special_price_box">
@@ -206,29 +212,64 @@
 									</span>
 								</div>
 								<?php } ?>
-
-
 							</td>
+
+
 							<td class="text-left">
 								<?php foreach ($categories as $category) { ?>
 								<?php if (in_array($category['category_id'], $product['category'])) { ?>
 								<?php echo $category['name'];?><br>
 								<?php } ?>
 								<?php } ?></td>
+
+
 							<td class="text-center" name="option_product_<?php echo $product['product_id'] ?>">
 								<button type="button" name="options_<?php echo $product['product_id'] ?>" data-toggle="tooltip" title="<?php echo $entry_options_button; ?>" class="btn btn-primary options_button"><i class="fa fa-plus-square"></i></button>
 							</td>
-							<td class="text-right column_quantity"><?php if ($product['quantity'] <= 0) { ?>
-								<span class="label label-warning"><?php echo $product['quantity']; ?></span>
-								<?php } elseif ($product['quantity'] <= 5) { ?>
-								<span class="label label-danger"><?php echo $product['quantity']; ?></span>
-								<?php } else { ?>
-								<span class="label label-success"><?php echo $product['quantity']; ?></span>
-								<?php } ?></td>
-							<td class="text-left column_status"><?php echo $product['status']; ?></td>
+
+
+							<td class="text-center column_quantity" style="width: 100px">
+								<input type="text"
+									   name="quantity_<?php echo $product['product_id'] ?>"
+									   value="<?php echo $product['quantity']; ?>"
+									   class="form-control"/>
+								<span class="old_quantity" style="display: none;"><?php echo $old_quantity_text; ?></span>
+								<span class="old_quantity"
+									  style="display: none;"
+									  name="old_quantity_<?php echo $product['product_id'] ?>">
+									<?php echo $product['quantity']; ?>
+								</span>
+							</td>
+
+
+							<td class="text-left column_status" style="width: 130px">
+								<select name="status_<?php echo $product['product_id'] ?>" class="form-control">
+									<?php if ($product['status']) { ?>
+										<option value="1" selected="selected"><?php echo $text_enabled; ?></option>
+										<option value="0"><?php echo $text_disabled; ?></option>
+									<?php } else { ?>
+										<option value="1"><?php echo $text_enabled; ?></option>
+										<option value="0" selected="selected"><?php echo $text_disabled; ?></option>
+									<?php } ?>
+								</select>
+								<span class="old_status" style="display: none;"><?php echo $old_status_text; ?></span>
+								<span class="old_status"
+									  style="display: none;"
+									  name="old_status_<?php echo $product['product_id'] ?>">
+									<?php if ($product['status']) { ?>
+									<?php echo $text_enabled; ?>
+									<?php } else { ?>
+									<?php echo $text_disabled; ?>
+									<?php } ?>
+								</span>
+							</td>
+
+
 							<td class="text-right">
 								<button type="button" name="<?php echo $product['product_id'] ?>" data-toggle="tooltip" title="<?php echo $entry_save; ?>" class="btn btn-primary save_button"><i class="fa fa-save"></i></button>
 								<a href="<?php echo $product['edit']; ?>" data-toggle="tooltip" title="<?php echo $entry_edit_product; ?>" class="btn btn-primary"><i class="fa fa-pencil"></i></a></td>
+
+
 						</tr>
 						<?php } ?>
 						<?php } else { ?>
@@ -257,23 +298,31 @@
 	$('.price_td [name ^= product_special_id_]:input').change(function(){
 		$(this).parent().siblings('.old_special_price').show();
 	});
+	//visible old prise special
+	$('[name ^= quantity_]:input').change(function(){
+		$(this).siblings('.old_quantity').show();
+	});
+	//visible old prise special
+	$('[name ^= status_]').change(function(){
+		$(this).siblings('.old_status').show();
+	});
 
 
 	$('.price_td [name ^= delete_special_]').click(function()
 		{
 			var inputSpecialPriceBox = $(this).parent().siblings(':input');
 			var product_special_id=inputSpecialPriceBox.attr('name').replace('product_special_id_', '');
-			alert(product_special_id);
+			//alert(product_special_id);
 			$.ajax({
 				url: 'index.php?route=extension/module/massive_change_in_price_bobs/deleteSpecial&token=<?php echo $token; ?>&product_special_id=' + product_special_id,
 				dataType: 'json',
 				success: function(json) {
-					alert(json);
+					//alert(json);
 					if(json != false) {
 						inputSpecialPriceBox.attr('name', 'product_special_id_'+json['product_special_id']);
 						inputSpecialPriceBox.val(json['price']);
-						alert('yes');
-						alert(json);
+						//alert('yes');
+						//alert(json);
 					} else {
 						inputSpecialPriceBox.parent().parent().hide();
 					}
@@ -290,10 +339,10 @@
 		var product_id=$(this).attr('name').replace('options_', '');
 		if (typeof product_id_option_open[product_id] != "undefined") {
 			showOrHide(product_id);
-			alert('showOrHide, product_id ' + product_id );
+			//alert('showOrHide, product_id ' + product_id );
 		} else {
 			renderOptions(product_id);
-			alert('renderOptions, product_id '  + product_id);
+			//alert('renderOptions, product_id '  + product_id);
 		}
 		hideAndShowColumn();
 	}
@@ -303,12 +352,12 @@
 			case 'show':
 				$("[name=option_product_" + product_id + "] .options_product_sub_block").hide();
 				product_id_option_open[product_id] = 'hide';
-					alert('hide: ' +product_id_option_open);
+					//alert('hide: ' +product_id_option_open);
 				break;
 			case 'hide':
 				$("[name=option_product_" + product_id + "] .options_product_sub_block").show();
 				product_id_option_open[product_id] = 'show';
-				alert('show: ' +product_id_option_open);
+				//alert('show: ' +product_id_option_open);
 				break;
 		}
 
@@ -377,9 +426,13 @@
 			var product_id = $(this).attr('name');
 			var price = $('[name = "price_' + product_id + '"]').val();
 			var price_special = $("[name ^= product_special_id_]", context_tr).val();
+			var quantity = $("[name ^= quantity_]", context_tr).val();
+			var status = $("[name ^= status_]", context_tr).val();
 
 			//gather date
-			url += $("[name ^= price_]", context_tr).attr('name') + "=" + encodeURIComponent($("[name ^= price_]", context_tr).val());
+			url += $("[name ^= price_]", context_tr).attr('name') +
+					"=" +
+					encodeURIComponent($("[name ^= price_]", context_tr).val());
 
 			$("[name ^= option_product] .form-control", context_tr).each(function(i,elem) {
 				url += '&' + $(this).attr('name') + "=" + encodeURIComponent($(this).val());
@@ -389,6 +442,15 @@
 				url += '&' + $(this).attr('name') + "=" + encodeURIComponent($(this).val());
 			});
 
+			url += "&" + $("[name ^= quantity_]", context_tr).attr('name') +
+			"=" +
+			encodeURIComponent($("[name ^= quantity_]", context_tr).val());
+
+			url += "&" + $("[name ^= status_]", context_tr).attr('name') +
+			"=" +
+			encodeURIComponent($("[name ^= status_]", context_tr).val());
+			//alert('name ' +$("[name ^= quantity_]", context_tr).attr('name'));
+			//alert('val ' +$("[name ^= quantity_]", context_tr).val());
 
 			$.ajax({
 				url: 'index.php?route=extension/module/massive_change_in_price_bobs/save&token=<?php echo $token; ?>',
@@ -397,10 +459,15 @@
 				data: url,
 				success: function(json) {
 					//alert(price+"p"+product_id);
-					$('[name ^= old_price_]', context_tr).text(price);
-					$("[name ^= old_special_price_] .form-control", context_tr).text(price_special);
+					$("[name ^= old_price_]", context_tr).text(price);
+					$("[name ^= old_special_price_]", context_tr).text(price_special);
+					$("[name ^= old_quantity_]", context_tr).text(quantity);
+					$("[name ^= old_status_]", context_tr).text(status);
+
 					$(".old_price", context_tr).hide();
 					$(".old_special_price", context_tr).hide();
+					$(".old_quantity", context_tr).hide();
+					$(".old_status", context_tr).hide();
 				}
 			});
 		}

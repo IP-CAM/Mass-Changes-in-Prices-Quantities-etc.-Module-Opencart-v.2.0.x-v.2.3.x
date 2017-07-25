@@ -34,6 +34,24 @@ class ModelExtensionMassiveChangeInPriceBobs extends Model
         );
     }
 
+    public function setProductQuantity($product_id, $quantity)
+    {
+        $this->db->query(
+            "UPDATE " . DB_PREFIX .
+            "product SET quantity=" . (int)$quantity .
+            " WHERE product_id=" . (int)$product_id
+        );
+    }
+
+    public function setProductStatus($product_id, $status)
+    {
+        $this->db->query(
+            "UPDATE " . DB_PREFIX .
+            "product SET status=" . (int)$status .
+            " WHERE product_id=" . (int)$product_id
+        );
+    }
+
     public function getProductIdBySpecial($product_special_id)
     {
         $sql = $this->db->query(
