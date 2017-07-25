@@ -161,7 +161,7 @@
 						<tbody>
 						<?php if ($products) { ?>
 						<?php foreach ($products as $product) { ?>
-						<tr>
+						<tr class="sfd">
 							<td class="text-center"><?php if ($product['image']) { ?>
 								<img src="<?php echo $product['image']; ?>" alt="<?php echo $product['name']; ?>" class="img-thumbnail" />
 								<?php } else { ?>
@@ -196,12 +196,12 @@
                           					<button type="button" name="delete_special_<?php echo $product['product_id'] ?>" data-toggle="tooltip" title="<?php echo $entry_save; ?>" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
                           				</span>
 									</div>
-									<span class="old_price_special" style="display: none;">
+									<span class="old_special_price" style="display: none;">
 										<?php echo $old_product_special_text; ?>
 									</span>
-									<span class="old_price_special"
+									<span class="old_special_price"
 										  style="display: none;"
-										  name="old_price_special_<?php echo $product['product_id'] ?>">
+										  name="old_special_price_<?php echo $product['product_id'] ?>">
 										<?php echo $product['special']['price']; ?>
 									</span>
 								</div>
@@ -215,7 +215,7 @@
 								<?php echo $category['name'];?><br>
 								<?php } ?>
 								<?php } ?></td>
-							<td class="text-center" id="option_product_<?php echo $product['product_id'] ?>">
+							<td class="text-center" name="option_product_<?php echo $product['product_id'] ?>">
 								<button type="button" name="options_<?php echo $product['product_id'] ?>" data-toggle="tooltip" title="<?php echo $entry_options_button; ?>" class="btn btn-primary options_button"><i class="fa fa-plus-square"></i></button>
 							</td>
 							<td class="text-right column_quantity"><?php if ($product['quantity'] <= 0) { ?>
@@ -255,7 +255,7 @@
 	});
 	//visible old prise special
 	$('.price_td [name ^= product_special_id_]:input').change(function(){
-		$(this).parent().siblings('.old_price_special').show();
+		$(this).parent().siblings('.old_special_price').show();
 	});
 
 
@@ -289,9 +289,11 @@
 	{
 		var product_id=$(this).attr('name').replace('options_', '');
 		if (typeof product_id_option_open[product_id] != "undefined") {
-			showOrHide(product_id)
+			showOrHide(product_id);
+			alert('showOrHide, product_id ' + product_id );
 		} else {
 			renderOptions(product_id);
+			alert('renderOptions, product_id '  + product_id);
 		}
 		hideAndShowColumn();
 	}
@@ -299,12 +301,14 @@
 	function showOrHide(product_id) {
 		switch(product_id_option_open[product_id]) {
 			case 'show':
-				$("#option_product_" + product_id + ' .options_product_sub_block').hide();
+				$("[name=option_product_" + product_id + "] .options_product_sub_block").hide();
 				product_id_option_open[product_id] = 'hide';
+					alert('hide: ' +product_id_option_open);
 				break;
 			case 'hide':
-				$("#option_product_" + product_id + ' .options_product_sub_block').show();
+				$("[name=option_product_" + product_id + "] .options_product_sub_block").show();
 				product_id_option_open[product_id] = 'show';
+				alert('show: ' +product_id_option_open);
 				break;
 		}
 
@@ -344,10 +348,10 @@
 						//alert(options);
 					}
 				} else {
-					$("#option_product_" + product_id).append('<div class="text-left"><?php echo $attentions_no_options; ?></div>');
+					options_sub += '<div class="text-left"><?php echo $attentions_no_options; ?></div>';
 				}
 				options_sub += '</div>';
-				$("#option_product_" + product_id).append(options_sub);
+				$("[name=option_product_" + product_id + "]").append(options_sub);
 			}
 		});
 	}
@@ -366,27 +370,37 @@
 
 	$('.save_button').click(function()
 		{
-			var product_id=$(this).attr('name');
-			var price=$('[name = "price_' + product_id + '"]').val();
 
 			var url = "";
-			$("#option_product_" + product_id + " .form-control").each(function(i,elem) {
+			var context_tr = $(this).parent().parent();
+
+			var product_id = $(this).attr('name');
+			var price = $('[name = "price_' + product_id + '"]').val();
+			var price_special = $("[name ^= product_special_id_]", context_tr).val();
+
+			//gather date
+			url += $("[name ^= price_]", context_tr).attr('name') + "=" + encodeURIComponent($("[name ^= price_]", context_tr).val());
+
+			$("[name ^= option_product] .form-control", context_tr).each(function(i,elem) {
 				url += '&' + $(this).attr('name') + "=" + encodeURIComponent($(this).val());
 			});
 
-			$(".price_td [name ^= product_special_id_]").each(function(i,elem) {
+			$("[name ^= product_special_id_]", context_tr).each(function(i,elem) {
 				url += '&' + $(this).attr('name') + "=" + encodeURIComponent($(this).val());
 			});
 
 
 			$.ajax({
-				url: 'index.php?route=extension/module/massive_change_in_price_bobs/save&token=<?php echo $token; ?>&product_id=' + product_id + '&price=' + price,
+				url: 'index.php?route=extension/module/massive_change_in_price_bobs/save&token=<?php echo $token; ?>',
 				dataType: 'json',
 				type: 'post',
 				data: url,
 				success: function(json) {
 					//alert(price+"p"+product_id);
-					$('[name = "old_price_' + product_id + '"]').text(price);
+					$('[name ^= old_price_]', context_tr).text(price);
+					$("[name ^= old_special_price_] .form-control", context_tr).text(price_special);
+					$(".old_price", context_tr).hide();
+					$(".old_special_price", context_tr).hide();
 				}
 			});
 		}
