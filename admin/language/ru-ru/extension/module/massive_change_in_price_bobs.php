@@ -11,7 +11,9 @@ $_['column_options']          	= 'Изменить опции';
 $_['button_view']          			= 'Показать';
 $_['button_save']          			= 'Сохранить все изменения';
 
-$_['old_product_text']          			= 'Цена до изменений';
+$_['product_special_text']          			= 'Цена по акции:';
+$_['old_product_special_text']          			= 'Цена по акции до изменения:';
+$_['old_product_text']          			= 'Цена до изменения:';
 $_['entry_save']          			= 'Сохранить цену';
 $_['entry_edit_product']          			= 'Перейти к редактированию продукта';
 $_['entry_options_button']          	= 'Показать опции продукта';

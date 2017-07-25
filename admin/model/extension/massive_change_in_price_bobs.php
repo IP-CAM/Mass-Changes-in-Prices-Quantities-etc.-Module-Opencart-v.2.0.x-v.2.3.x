@@ -25,6 +25,43 @@ class ModelExtensionMassiveChangeInPriceBobs extends Model
         );
     }
 
+    public function setProductSpecialPrice($product_special_id, $special_price)
+    {
+        $this->db->query(
+            "UPDATE " . DB_PREFIX .
+            "product_special SET price=" . (int)$special_price .
+            " WHERE product_special_id=" . (int)$product_special_id
+        );
+    }
+
+    public function getProductIdBySpecial($product_special_id)
+    {
+        $sql = $this->db->query(
+            "SELECT product_id FROM " . DB_PREFIX .
+            "product_special " .
+            " WHERE product_special_id=" . (int)$product_special_id
+        );
+        return $sql->row['product_id'];
+    }
+
+    public function deleteSpecial($product_special_id)
+    {
+        $this->db->query(
+            "DELETE FROM " . DB_PREFIX .
+            "product_special " .
+            " WHERE product_special_id=" . (int)$product_special_id
+        );
+    }
+
+    public function getSpecialByProduct($product_id)
+    {
+        $sql = $this->db->query(
+            "SELECT product_special_id, price FROM " . DB_PREFIX .
+            "product_special " .
+            " WHERE product_id=" . (int)$product_id . " ORDER BY priority LIMIT 1"
+        );
+        return $sql->row;
+    }
 
 }
 

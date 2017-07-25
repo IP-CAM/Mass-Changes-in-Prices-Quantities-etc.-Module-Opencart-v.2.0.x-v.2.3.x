@@ -110,7 +110,7 @@
 				<div class="well">
 					<div class="row form-group">
 						<div class="col-sm-8">
-							<input type="text" name="base_price_factor" value="<?php echo $base_price_factor; ?>" placeholder="<?php echo $help_base_price; ?>" id="input-price" class="form-control" />
+							<input type="text" name="base_price_factor" value="<?php echo $base_price_factor; ?>" placeholder="<?php echo $help_base_price; ?>" class="form-control" />
 						</div>
 						<div class="col-sm-1">
 							<button name="base_price_button" form="form-base-price"  data-toggle="tooltip" title="<?php echo $help_base_price_button; ?>" class="btn btn-primary"><i class="fa fa-hand-o-up"></i></button>
@@ -170,18 +170,45 @@
 							<td class="text-left"><?php echo $product['name']; ?></td>
 							<td class="text-left"><?php echo $product['model']; ?></td>
 
-							<td class="text-right"><?php if ($product['special']) { ?>
-									<span><input type="text" name="price_<?php echo $product['product_id'] ?>" value="<?php echo $product['price']; ?>" placeholder="<?php echo $entry_price; ?>" id="input-price" class="form-control" /></span><br/>
-									<div class="text-danger"><?php echo $product['special']; ?></div>
-									<span><?php echo $old_product_text; ?></span>
-									<span style="text-decoration: line-through;" name="old_price_<?php echo $product['product_id'] ?>"><?php echo $product['price']; ?></span>
-								<?php } else { ?>
-									<input type="text" name="price_<?php echo $product['product_id'] ?>" value="<?php echo $product['price']; ?>" placeholder="<?php echo $entry_price; ?>" id="input-price" class="form-control" />
-									<span><?php echo $old_product_text; ?></span>
-									<span name="old_price_<?php echo $product['product_id'] ?>"><?php echo $product['price']; ?></span>
-								<?php } ?>
-								</td>
+							<td class="text-left price_td">
 
+								<input type="text"
+									   name="price_<?php echo $product['product_id'] ?>"
+									   value="<?php echo $product['price']; ?>"
+									   placeholder="<?php echo $entry_price; ?>"
+									   class="form-control"/>
+								<span class="old_price" style="display: none;"><?php echo $old_product_text; ?></span>
+								<span class="old_price"
+									  style="display: none;"
+									  name="old_price_<?php echo $product['product_id'] ?>">
+									<?php echo $product['price']; ?></span></br>
+
+
+								<?php if (!empty($product['special'])) { ?>
+								<div class="special_price_box">
+									<span><?php echo $product_special_text; ?></span>
+									<div class="input-group">
+										<input type="text"
+											   name="product_special_id_<?php echo $product['special']['product_special_id'] ?>"
+											   value="<?php echo $product['special']['price']; ?>"
+											   class="form-control"/>
+                          				<span class="input-group-btn">
+                          					<button type="button" name="delete_special_<?php echo $product['product_id'] ?>" data-toggle="tooltip" title="<?php echo $entry_save; ?>" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
+                          				</span>
+									</div>
+									<span class="old_price_special" style="display: none;">
+										<?php echo $old_product_special_text; ?>
+									</span>
+									<span class="old_price_special"
+										  style="display: none;"
+										  name="old_price_special_<?php echo $product['product_id'] ?>">
+										<?php echo $product['special']['price']; ?>
+									</span>
+								</div>
+								<?php } ?>
+
+
+							</td>
 							<td class="text-left">
 								<?php foreach ($categories as $category) { ?>
 								<?php if (in_array($category['category_id'], $product['category'])) { ?>
@@ -222,21 +249,53 @@
 </div>
 <script type="text/javascript"><!--
 
+	//visible old prise
+	$('.price_td [name ^= price_]:input').change(function(){
+		$(this).siblings('.old_price').show();
+	});
+	//visible old prise special
+	$('.price_td [name ^= product_special_id_]:input').change(function(){
+		$(this).parent().siblings('.old_price_special').show();
+	});
+
+
+	$('.price_td [name ^= delete_special_]').click(function()
+		{
+			var inputSpecialPriceBox = $(this).parent().siblings(':input');
+			var product_special_id=inputSpecialPriceBox.attr('name').replace('product_special_id_', '');
+			alert(product_special_id);
+			$.ajax({
+				url: 'index.php?route=extension/module/massive_change_in_price_bobs/deleteSpecial&token=<?php echo $token; ?>&product_special_id=' + product_special_id,
+				dataType: 'json',
+				success: function(json) {
+					alert(json);
+					if(json != false) {
+						inputSpecialPriceBox.attr('name', 'product_special_id_'+json['product_special_id']);
+						inputSpecialPriceBox.val(json['price']);
+						alert('yes');
+						alert(json);
+					} else {
+						inputSpecialPriceBox.parent().parent().hide();
+					}
+				}
+			});
+			}
+	);
+
 
 	var product_id_option_open= [];
 	$('.table-responsive').on('click', '.options_button', handler);
 	function handler()
-		{
-			var product_id=$(this).attr('name').replace('options_', '');
-			if (typeof product_id_option_open[product_id] != "undefined") {
-				showOrHide(product_id)
-			} else {
-				renderOptions(product_id);
-			}
-
-
-
+	{
+		var product_id=$(this).attr('name').replace('options_', '');
+		if (typeof product_id_option_open[product_id] != "undefined") {
+			showOrHide(product_id)
+		} else {
+			renderOptions(product_id);
 		}
+		hideAndShowColumn();
+	}
+
 	function showOrHide(product_id) {
 		switch(product_id_option_open[product_id]) {
 			case 'show':
@@ -246,16 +305,9 @@
 			case 'hide':
 				$("#option_product_" + product_id + ' .options_product_sub_block').show();
 				product_id_option_open[product_id] = 'show';
-				$('.column_quantity').hide();
-				$('.column_status').hide();
-				//alert("s_h " + product_id_option_open[product_id] + 'show');
 				break;
 		}
-		if(product_id_option_open.indexOf('show') == -1) {
 
-			$('.column_quantity').show();
-			$('.column_status').show();
-		}
 	}
 
 	function renderOptions(product_id) {
@@ -264,9 +316,6 @@
 			url: 'index.php?route=extension/module/massive_change_in_price_bobs/options&token=<?php echo $token; ?>&product_id=' + product_id,
 			dataType: 'json',
 			success: function (json) {
-				//hide column table
-				$('.column_quantity').hide();
-				$('.column_status').hide();
 				var options_sub = '<div class="options_product_sub_block">';
 				if(json.length)
 				{
@@ -303,14 +352,38 @@
 		});
 	}
 
+	function hideAndShowColumn() {
+		if(product_id_option_open.indexOf('show') == -1) {
+
+			$('.column_quantity').show();
+			$('.column_status').show();
+		} else {
+			$('.column_quantity').hide();
+			$('.column_status').hide();
+		}
+	}
+
+
 	$('.save_button').click(function()
 		{
 			var product_id=$(this).attr('name');
 			var price=$('[name = "price_' + product_id + '"]').val();
 
+			var url = "";
+			$("#option_product_" + product_id + " .form-control").each(function(i,elem) {
+				url += '&' + $(this).attr('name') + "=" + encodeURIComponent($(this).val());
+			});
+
+			$(".price_td [name ^= product_special_id_]").each(function(i,elem) {
+				url += '&' + $(this).attr('name') + "=" + encodeURIComponent($(this).val());
+			});
+
+
 			$.ajax({
-				url: 'index.php?route=extension/module/massive_change_in_price_bobs/save&token=<?php echo $token; ?>&product_id=' + product_id + '&price=' + price + optionUrl(product_id),
+				url: 'index.php?route=extension/module/massive_change_in_price_bobs/save&token=<?php echo $token; ?>&product_id=' + product_id + '&price=' + price,
 				dataType: 'json',
+				type: 'post',
+				data: url,
 				success: function(json) {
 					//alert(price+"p"+product_id);
 					$('[name = "old_price_' + product_id + '"]').text(price);
@@ -318,15 +391,6 @@
 			});
 		}
 	);
-	function optionUrl(product_id)
-	{
-		var url = "";
-		$("#option_product_" + product_id + " .form-control").each(function(i,elem) {
-			url += '&' + $(this).attr('name') + "=" + $(this).val();
-			//alert(url);
-		});
-		return url;
-	}
 	//--></script>
 
 <script type="text/javascript"><!--
