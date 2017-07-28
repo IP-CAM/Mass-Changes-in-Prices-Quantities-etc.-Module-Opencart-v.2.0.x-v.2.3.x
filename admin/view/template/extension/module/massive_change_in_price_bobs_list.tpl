@@ -144,6 +144,7 @@
 								<a href="<?php echo $sort_price; ?>"><?php echo $column_price; ?></a>
 								<?php } ?></td>
 							<td class="text-left"><?php echo $column_category; ?></td>
+							<td class="text-left"><?php echo $column_discount; ?></td>
 							<td class="text-left"><?php echo $column_options; ?></td>
 							<td class="text-right column_quantity"><?php if ($sort == 'p.quantity') { ?>
 								<a href="<?php echo $sort_quantity; ?>" class="<?php echo strtolower($order); ?>"><?php echo $column_quantity; ?></a>
@@ -199,7 +200,7 @@
 											   value="<?php echo $product['special']['price']; ?>"
 											   class="form-control"/>
                           				<span class="input-group-btn">
-                          					<button type="button" name="delete_special_<?php echo $product['product_id'] ?>" data-toggle="tooltip" title="<?php echo $entry_save; ?>" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
+                          					<button type="button" name="delete_special_<?php echo $product['product_id'] ?>" data-toggle="tooltip" title="<?php echo $entry_delete_special; ?>" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
                           				</span>
 									</div>
 									<span class="old_special_price" style="display: none;">
@@ -223,7 +224,11 @@
 								<?php } ?></td>
 
 
-							<td class="text-center" name="option_product_<?php echo $product['product_id'] ?>">
+							<td class="text-center" name="discount_product_<?php echo $product['product_id'] ?>">
+								<button type="button" name="discount_<?php echo $product['product_id'] ?>" data-toggle="tooltip" title="<?php echo $entry_discount_button; ?>" class="btn btn-primary discount_button"><i class="fa fa-plus-square"></i></button>
+							</td>
+
+							<td class="text-center" name="options_product_<?php echo $product['product_id'] ?>">
 								<button type="button" name="options_<?php echo $product['product_id'] ?>" data-toggle="tooltip" title="<?php echo $entry_options_button; ?>" class="btn btn-primary options_button"><i class="fa fa-plus-square"></i></button>
 							</td>
 
@@ -332,39 +337,114 @@
 	);
 
 
-	var product_id_option_open= [];
-	$('.table-responsive').on('click', '.options_button', handler);
-	function handler()
+	var product_id_discount_open= [];
+	$('.table-responsive').on('click', '.discount_button', discount);
+	function discount() {
+		viewPostParameters(this, 'discount', product_id_discount_open)
+	}
+
+
+	var product_id_options_open= [];
+	$('.table-responsive').on('click', '.options_button', options);
+	function options() {
+		viewPostParameters(this, 'options', product_id_options_open);
+	}
+
+
+
+	function viewPostParameters(this_event_call, prefix, product_id_array)
 	{
-		var product_id=$(this).attr('name').replace('options_', '');
-		if (typeof product_id_option_open[product_id] != "undefined") {
-			showOrHide(product_id);
+
+		prefix = prefix + "_";
+		var product_id=$(this_event_call).attr('name').replace(prefix, '');
+		//alert(prefix +' as ' + product_id);
+		if (typeof product_id_array[product_id] != "undefined") {
+			//alert("dom : " + "[name=" + prefix + "product_" + product_id + "] ." + prefix + "product_sub_block");
+			var DOM_element = $("[name=" + prefix + "product_" + product_id + "] ." + prefix + "product_sub_block");
+			//alert("name :  " +DOM_element.attr('name'));
+			//alert('DOM_element ' + DOM_element);
+			showOrHide(product_id, DOM_element, product_id_array);
 			//alert('showOrHide, product_id ' + product_id );
 		} else {
-			renderOptions(product_id);
+			//alert('dsfs');
+			product_id_array[product_id] = 'show';
+			switch(prefix) {
+				case 'discount_':
+					renderDiscount(product_id);
+					break;
+				case 'options_':
+					renderOptions(product_id);
+					break;
+			}
+
 			//alert('renderOptions, product_id '  + product_id);
 		}
 		hideAndShowColumn();
 	}
 
-	function showOrHide(product_id) {
-		switch(product_id_option_open[product_id]) {
-			case 'show':
-				$("[name=option_product_" + product_id + "] .options_product_sub_block").hide();
-				product_id_option_open[product_id] = 'hide';
-					//alert('hide: ' +product_id_option_open);
-				break;
-			case 'hide':
-				$("[name=option_product_" + product_id + "] .options_product_sub_block").show();
-				product_id_option_open[product_id] = 'show';
-				//alert('show: ' +product_id_option_open);
-				break;
-		}
 
+	function renderDiscount(product_id) {
+		//alert('dsfs2');
+		$.ajax({
+			url: 'index.php?route=extension/module/massive_change_in_price_bobs/discount&token=<?php echo $token; ?>&product_id=' + product_id,
+			dataType: 'json',
+			success: function (json) {
+				//alert('success ' + json);
+				var discount_sub = '<div class="discount_product_sub_block">';
+
+
+
+				if(json.length)
+				{
+					//alert('dsfs ' + json.length);
+					var discount = '';
+					discount +='<div class="row text-left">';
+					discount +='<div class="col-sm-4">';
+					discount +='<?php echo $discount_text_quantity; ?>';
+					discount +='</div>';
+					discount +='<div class="col-sm-8">';
+					discount +='<?php echo $discount_text_price; ?>';
+					discount +='</div>';
+					discount +='</div>';
+
+					discount_sub += discount;
+					for (i = 0; i < json.length; i++) {
+						////alert('555');
+
+							var discount = '';
+							discount +='<div class="row text-left">';
+								discount +='<div class="col-sm-4 discount_quantity">';
+									discount +='<input type="text" name="product_discount_id_' + json[i]['product_discount_id'] + '" value="' + json[i]['quantity'] + '" class="form-control"/>';
+								discount +='</div>';
+								discount +='<div class="col-sm-8 discount_price">';
+									discount +='<div class="input-group">';
+											discount +='<input type="text" name="product_discount_id_' + json[i]['product_discount_id'] + '" value="' + json[i]['price'] + '" class="form-control"/>';
+										discount +='<span class="input-group-btn">';
+											discount +='<button type="button" name="delete_discount_' + json[i]['product_discount_id'] + '" data-toggle="tooltip" title="<?php echo $entry_delete_discount; ?>" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>';
+										discount +='</span>';
+									discount +='</div>';
+								discount +='</div>';
+							discount +='</div>';
+
+						discount_sub += discount;
+						//alert(discount);
+					}
+				} else {
+					discount_sub += '<div class="text-left"><?php echo $attentions_no_discount; ?></div>';
+				}
+				discount_sub += '</div>';
+				$("[name=discount_product_" + product_id + "]").append(discount_sub);
+			}
+		});
 	}
 
+
+
+
+
+
 	function renderOptions(product_id) {
-		product_id_option_open[product_id] = 'show';
+		//alert('renderOptions' + ' ' + product_id);
 		$.ajax({
 			url: 'index.php?route=extension/module/massive_change_in_price_bobs/options&token=<?php echo $token; ?>&product_id=' + product_id,
 			dataType: 'json',
@@ -400,13 +480,30 @@
 					options_sub += '<div class="text-left"><?php echo $attentions_no_options; ?></div>';
 				}
 				options_sub += '</div>';
-				$("[name=option_product_" + product_id + "]").append(options_sub);
+				$("[name=options_product_" + product_id + "]").append(options_sub);
 			}
 		});
 	}
 
+
+	function showOrHide(product_id, DOM_element, product_id_array) {
+		switch(product_id_array[product_id]) {
+			case 'show':
+				DOM_element.hide();
+				product_id_array[product_id] = 'hide';
+				//alert('DOM_element: ' +DOM_element.attr('name'));
+				break;
+			case 'hide':
+				DOM_element.show();
+				product_id_array[product_id] = 'show';
+				//alert('show: ' +product_id_options_open);
+				break;
+		}
+	}
+
 	function hideAndShowColumn() {
-		if(product_id_option_open.indexOf('show') == -1) {
+		if(product_id_discount_open.indexOf('show') == -1 &&
+				product_id_options_open.indexOf('show') == -1) {
 
 			$('.column_quantity').show();
 			$('.column_status').show();
@@ -429,12 +526,13 @@
 			var quantity = $("[name ^= quantity_]", context_tr).val();
 			var status = $("[name ^= status_]", context_tr).val();
 
+
 			//gather date
 			url += $("[name ^= price_]", context_tr).attr('name') +
 					"=" +
 					encodeURIComponent($("[name ^= price_]", context_tr).val());
 
-			$("[name ^= option_product] .form-control", context_tr).each(function(i,elem) {
+			$("[name ^= options_product] .form-control", context_tr).each(function(i,elem) {
 				url += '&' + $(this).attr('name') + "=" + encodeURIComponent($(this).val());
 			});
 

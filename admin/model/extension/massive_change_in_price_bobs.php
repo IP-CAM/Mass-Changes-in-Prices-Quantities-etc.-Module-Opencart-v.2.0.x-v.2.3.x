@@ -81,6 +81,37 @@ class ModelExtensionMassiveChangeInPriceBobs extends Model
         return $sql->row;
     }
 
+    public function getProductDiscount($product_id)
+    {
+
+        $query = $this->db->query("SELECT product_discount_id, quantity, priority, price  FROM " . DB_PREFIX . "product_discount WHERE product_id = '" . (int)$product_id . "' AND quantity > 1 AND ((date_start = '0000-00-00' OR date_start < NOW()) AND (date_end = '0000-00-00' OR date_end > NOW())) ORDER BY quantity ASC, priority ASC, price ASC");
+        $discount = Array();
+        foreach($query->rows as $discount_table)
+        {
+            $check = 0;
+            foreach($discount as $key => $dis_value)
+            {
+                if($discount_table['quantity'] == $dis_value['quantity'])
+                {
+                    if($discount_table['priority'] >= $dis_value['priority'])
+                    {
+                        $check = 1;
+                        continue;
+                    } else {
+                        $discount[$key] = $dis_value; //Update
+                        $check = 1;
+                        continue;
+                    }
+                }
+            }
+            if($check) {
+                continue;
+            }
+            $discount[] = $discount_table;
+        }
+        return $discount;
+    }
+
 }
 
 
