@@ -336,6 +336,22 @@
 			}
 	);
 
+	$('.table-responsive').on('click', '[name ^= delete_discount_]', deleteDiscount);
+	function deleteDiscount() {
+
+		alert($(this).attr('name'));
+		var product_discount_id = $(this).attr('name').replace('delete_discount_', '');
+		var button_delete = $(this);
+		$.ajax({
+			url: 'index.php?route=extension/module/massive_change_in_price_bobs/deleteDiscount&token=<?php echo $token; ?>&product_discount_id=' + product_discount_id,
+			dataType: 'json',
+			success: function (json) {
+				button_delete.parent().parent().parent().parent().hide();
+
+			}
+		});
+	}
+
 
 	var product_id_discount_open= [];
 	$('.table-responsive').on('click', '.discount_button', discount);
@@ -392,8 +408,6 @@
 				//alert('success ' + json);
 				var discount_sub = '<div class="discount_product_sub_block">';
 
-
-
 				if(json.length)
 				{
 					//alert('dsfs ' + json.length);
@@ -413,12 +427,12 @@
 
 							var discount = '';
 							discount +='<div class="row text-left">';
-								discount +='<div class="col-sm-4 discount_quantity">';
-									discount +='<input type="text" name="product_discount_id_' + json[i]['product_discount_id'] + '" value="' + json[i]['quantity'] + '" class="form-control"/>';
+								discount +='<div class="col-sm-4">';
+									discount +='<input type="text" name="product_discount_quantity_id_' + json[i]['product_discount_id'] + '" value="' + json[i]['quantity'] + '" class="form-control"/>';
 								discount +='</div>';
-								discount +='<div class="col-sm-8 discount_price">';
+								discount +='<div class="col-sm-8">';
 									discount +='<div class="input-group">';
-											discount +='<input type="text" name="product_discount_id_' + json[i]['product_discount_id'] + '" value="' + json[i]['price'] + '" class="form-control"/>';
+											discount +='<input type="text" name="product_discount_price_id_' + json[i]['product_discount_id'] + '" value="' + json[i]['price'] + '" class="form-control"/>';
 										discount +='<span class="input-group-btn">';
 											discount +='<button type="button" name="delete_discount_' + json[i]['product_discount_id'] + '" data-toggle="tooltip" title="<?php echo $entry_delete_discount; ?>" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>';
 										discount +='</span>';
@@ -430,12 +444,21 @@
 						//alert(discount);
 					}
 				} else {
-					discount_sub += '<div class="text-left"><?php echo $attentions_no_discount; ?></div>';
+					discount_sub += attentionsNoDiscountHTML;
 				}
 				discount_sub += '</div>';
 				$("[name=discount_product_" + product_id + "]").append(discount_sub);
 			}
 		});
+	}
+
+	function renderDiscountHTML(json) {
+
+
+	}
+
+	function attentionsNoDiscountHTML() {
+		return '<div class="text-left"><?php echo $attentions_no_discount; ?></div>';
 	}
 
 
@@ -523,7 +546,10 @@
 			var product_id = $(this).attr('name');
 			var price = $('[name = "price_' + product_id + '"]').val();
 			var price_special = $("[name ^= product_special_id_]", context_tr).val();
+			//var discount_quantity = $("[name ^= product_discount_quantity_id_]", context_tr).val();
+			//var discount_price = $("[name ^= product_discount_price_id_]", context_tr).val();
 			var quantity = $("[name ^= quantity_]", context_tr).val();
+
 			var status = $("[name ^= status_]", context_tr).val();
 
 
@@ -531,6 +557,14 @@
 			url += $("[name ^= price_]", context_tr).attr('name') +
 					"=" +
 					encodeURIComponent($("[name ^= price_]", context_tr).val());
+
+
+			$("[name ^= discount_product] .form-control", context_tr).each(function(i,elem) {
+				url += '&' + $(this).attr('name') + "=" + encodeURIComponent($(this).val());
+				alert('kjh');
+			});
+
+
 
 			$("[name ^= options_product] .form-control", context_tr).each(function(i,elem) {
 				url += '&' + $(this).attr('name') + "=" + encodeURIComponent($(this).val());
