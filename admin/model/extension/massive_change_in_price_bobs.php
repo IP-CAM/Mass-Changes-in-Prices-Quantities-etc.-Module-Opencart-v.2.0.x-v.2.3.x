@@ -114,29 +114,45 @@ class ModelExtensionMassiveChangeInPriceBobs extends Model
 
     public function deleteDiscount($product_discount_id)
     {
-       /* $this->db->query(
+        $this->db->query(
             "DELETE FROM " . DB_PREFIX .
             "product_discount " .
             " WHERE product_discount_id=" . (int)$product_discount_id
-        );*/
+        );
     }
-
-    public function getDiscountNumber($product_discount_id)
-    {
-        /* $this->db->query(
-             "DELETE FROM " . DB_PREFIX .
-             "product_discount " .
-             " WHERE product_discount_id=" . (int)$product_discount_id
-         );*/
-    }
-
 
 
     public function getProductDiscount($product_id)
     {
 
         $query = $this->db->query("SELECT product_discount_id, quantity, priority, price  FROM " . DB_PREFIX . "product_discount WHERE product_id = '" . (int)$product_id . "' AND quantity > 1 AND ((date_start = '0000-00-00' OR date_start < NOW()) AND (date_end = '0000-00-00' OR date_end > NOW())) ORDER BY quantity ASC, priority ASC, price ASC");
-        return $query->rows;
+
+        $discount_norm = Array();
+        foreach($query->rows as $discount_table)
+        {
+            $check = 0;
+            foreach($discount_norm as $key => $discount_norm_value)
+            {
+                if($discount_table['quantity'] == $discount_norm_value['quantity'])
+                {
+                    if($discount_table['priority'] >= $discount_norm_value['priority'])
+                    {
+                        $check = 1;
+                        continue;
+                    } else {
+                        $discount_norm[$key] = $discount_norm_value; //Update
+                        $check = 1;
+                        continue;
+                    }
+                }
+            }
+            if($check) {
+                continue;
+            }
+            $discount_norm[] = $discount_table;
+        }
+
+        return $discount_norm;
     }
 
 }

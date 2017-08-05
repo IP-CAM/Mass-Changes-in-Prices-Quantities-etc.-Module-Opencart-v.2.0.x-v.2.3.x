@@ -339,14 +339,17 @@
 	$('.table-responsive').on('click', '[name ^= delete_discount_]', deleteDiscount);
 	function deleteDiscount() {
 
-		alert($(this).attr('name'));
 		var product_discount_id = $(this).attr('name').replace('delete_discount_', '');
 		var button_delete = $(this);
 		$.ajax({
 			url: 'index.php?route=extension/module/massive_change_in_price_bobs/deleteDiscount&token=<?php echo $token; ?>&product_discount_id=' + product_discount_id,
 			dataType: 'json',
 			success: function (json) {
-				button_delete.parent().parent().parent().parent().hide();
+				var context_tr = button_delete.parent().parent().parent().parent().parent().parent();
+				$('.discount_product_sub_block', context_tr).empty();
+				//context_tr.empty();
+				var discount_sub = renderDiscountHTML(json);
+				$('.discount_product_sub_block', context_tr).append(discount_sub);
 
 			}
 		});
@@ -404,56 +407,57 @@
 		$.ajax({
 			url: 'index.php?route=extension/module/massive_change_in_price_bobs/discount&token=<?php echo $token; ?>&product_id=' + product_id,
 			dataType: 'json',
-			success: function (json) {
-				//alert('success ' + json);
-				var discount_sub = '<div class="discount_product_sub_block">';
-
-				if(json.length)
-				{
-					//alert('dsfs ' + json.length);
-					var discount = '';
-					discount +='<div class="row text-left">';
-					discount +='<div class="col-sm-4">';
-					discount +='<?php echo $discount_text_quantity; ?>';
-					discount +='</div>';
-					discount +='<div class="col-sm-8">';
-					discount +='<?php echo $discount_text_price; ?>';
-					discount +='</div>';
-					discount +='</div>';
-
-					discount_sub += discount;
-					for (i = 0; i < json.length; i++) {
-						////alert('555');
-
-							var discount = '';
-							discount +='<div class="row text-left">';
-								discount +='<div class="col-sm-4">';
-									discount +='<input type="text" name="product_discount_quantity_id_' + json[i]['product_discount_id'] + '" value="' + json[i]['quantity'] + '" class="form-control"/>';
-								discount +='</div>';
-								discount +='<div class="col-sm-8">';
-									discount +='<div class="input-group">';
-											discount +='<input type="text" name="product_discount_price_id_' + json[i]['product_discount_id'] + '" value="' + json[i]['price'] + '" class="form-control"/>';
-										discount +='<span class="input-group-btn">';
-											discount +='<button type="button" name="delete_discount_' + json[i]['product_discount_id'] + '" data-toggle="tooltip" title="<?php echo $entry_delete_discount; ?>" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>';
-										discount +='</span>';
-									discount +='</div>';
-								discount +='</div>';
-							discount +='</div>';
-
-						discount_sub += discount;
-						//alert(discount);
-					}
-				} else {
-					discount_sub += attentionsNoDiscountHTML;
-				}
-				discount_sub += '</div>';
+			success: function(json){
+				var discount_sub = renderDiscountHTML(json);
 				$("[name=discount_product_" + product_id + "]").append(discount_sub);
 			}
 		});
 	}
 
 	function renderDiscountHTML(json) {
+		var discount_sub = '<div class="discount_product_sub_block">';
 
+		if(json.length)
+		{
+			//alert('dsfs ' + json.length);
+			var discount = '';
+			discount +='<div class="row text-left">';
+			discount +='<div class="col-sm-4">';
+			discount +='<?php echo $discount_text_quantity; ?>';
+			discount +='</div>';
+			discount +='<div class="col-sm-8">';
+			discount +='<?php echo $discount_text_price; ?>';
+			discount +='</div>';
+			discount +='</div>';
+
+			discount_sub += discount;
+			for (i = 0; i < json.length; i++) {
+				////alert('555');
+
+				var discount = '';
+				discount +='<div class="row text-left">';
+				discount +='<div class="col-sm-4">';
+				discount +='<input type="text" name="product_discount_quantity_id_' + json[i]['product_discount_id'] + '" value="' + json[i]['quantity'] + '" class="form-control"/>';
+				discount +='</div>';
+				discount +='<div class="col-sm-8">';
+				discount +='<div class="input-group">';
+				discount +='<input type="text" name="product_discount_price_id_' + json[i]['product_discount_id'] + '" value="' + json[i]['price'] + '" class="form-control"/>';
+				discount +='<span class="input-group-btn">';
+				discount +='<button type="button" name="delete_discount_' + json[i]['product_discount_id'] + '" data-toggle="tooltip" title="<?php echo $entry_delete_discount; ?>" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>';
+				discount +='</span>';
+				discount +='</div>';
+				discount +='</div>';
+				discount +='</div>';
+
+				discount_sub += discount;
+				//alert(discount);
+			}
+		} else {
+			discount_sub += attentionsNoDiscountHTML();
+		}
+		discount_sub += '</div>';
+
+		return discount_sub;
 
 	}
 
