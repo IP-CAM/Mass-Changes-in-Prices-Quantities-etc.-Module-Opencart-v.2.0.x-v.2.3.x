@@ -106,14 +106,24 @@
 				</div>
 			</div>
 
+
+			<!-- PRICE MODIFIER -->
 			<form action="<?php echo $basePrice; ?>" method="post" id="form-base-price">
 				<div class="well">
 					<div class="row form-group">
-						<div class="col-sm-8">
+						<div class="col-sm-1">
+							<select name="base_price_factor_prefix" class="form-control">
+								<option value="+" <?php if($base_price_factor_prefix == '+') { ?> selected="selected" <?php } ?>>+</option>
+								<option value="-" <?php if($base_price_factor_prefix == '-') { ?> selected="selected" <?php } ?>>-</option>
+								<option value="*" <?php if($base_price_factor_prefix == '*') { ?> selected="selected" <?php } ?>>*</option>
+								<option value="=" <?php if($base_price_factor_prefix == '=') { ?> selected="selected" <?php } ?>>=</option>
+							</select>
+						</div>
+						<div class="col-sm-7">
 							<input type="text" name="base_price_factor" value="<?php echo $base_price_factor; ?>" placeholder="<?php echo $help_base_price; ?>" class="form-control" />
 						</div>
 						<div class="col-sm-1">
-							<button name="base_price_button" form="form-base-price"  data-toggle="tooltip" title="<?php echo $help_base_price_button; ?>" class="btn btn-primary"><i class="fa fa-hand-o-up"></i></button>
+							<button onclick="confirm('<?php echo $text_confirm_quest; ?>') ? $('#form-base-price').submit() : false;" data-toggle="tooltip" title="<?php echo $help_base_price_button; ?>" class="btn btn-primary"><i class="fa fa-hand-o-up"></i></button>
 						</div>
 						<div class="col-sm-3">
 							<span><?php echo $help_base_price; ?></span>
@@ -121,6 +131,35 @@
 					</div>
 				</div>
 			</form>
+			<!-- PRICE MODIFIER end -->
+
+
+			<!-- QUANTITY MODIFIER -->
+			<form action="<?php echo $baseQuantity; ?>" method="post" id="form-base-quantity">
+				<div class="well">
+					<div class="row form-group">
+						<div class="col-sm-1">
+							<select name="base_quantity_factor_prefix" class="form-control">
+								<option value="+" <?php if($base_quantity_factor_prefix == '+') { ?> selected="selected" <?php } ?>>+</option>
+								<option value="-" <?php if($base_quantity_factor_prefix == '-') { ?> selected="selected" <?php } ?>>-</option>
+								<option value="*" <?php if($base_quantity_factor_prefix == '*') { ?> selected="selected" <?php } ?>>*</option>
+								<option value="=" <?php if($base_quantity_factor_prefix == '=') { ?> selected="selected" <?php } ?>>=</option>
+							</select>
+						</div>
+						<div class="col-sm-7">
+							<input type="text" name="base_quantity_factor" value="<?php echo $base_quantity_factor; ?>" placeholder="<?php echo $help_base_quantity; ?>" class="form-control" />
+						</div>
+						<div class="col-sm-1">
+							<button onclick="confirm('<?php echo $text_confirm_quest; ?>') ? $('#form-base-quantity').submit() : false;"  data-toggle="tooltip" title="<?php echo $help_base_quantity_button; ?>" class="btn btn-primary"><i class="fa fa-hand-o-up"></i></button>
+						</div>
+						<div class="col-sm-3">
+							<span><?php echo $help_base_quantity; ?></span>
+						</div>
+					</div>
+				</div>
+			</form>
+			<!-- QUANTITY MODIFIER end -->
+
 			<form action="<?php echo $saveAll; ?>" method="post" id="form-product">
 
 				<div class="table-responsive">
@@ -315,44 +354,46 @@
 
 	$('.price_td [name ^= delete_special_]').click(function()
 		{
-			var inputSpecialPriceBox = $(this).parent().siblings(':input');
-			var product_special_id=inputSpecialPriceBox.attr('name').replace('product_special_id_', '');
-			//alert(product_special_id);
-			$.ajax({
-				url: 'index.php?route=extension/module/massive_change_in_price_bobs/deleteSpecial&token=<?php echo $token; ?>&product_special_id=' + product_special_id,
-				dataType: 'json',
-				success: function(json) {
-					//alert(json);
-					if(json != false) {
-						inputSpecialPriceBox.attr('name', 'product_special_id_'+json['product_special_id']);
-						inputSpecialPriceBox.val(json['price']);
-						//alert('yes');
-						//alert(json);
-					} else {
-						inputSpecialPriceBox.parent().parent().hide();
+			if(confirm('<?php echo $text_confirm_quest ?>')) { //message
+				var inputSpecialPriceBox = $(this).parent().siblings(':input');
+				var product_special_id=inputSpecialPriceBox.attr('name').replace('product_special_id_', '');
+
+				$.ajax({
+					url: 'index.php?route=extension/module/massive_change_in_price_bobs/deleteSpecial&token=<?php echo $token; ?>&product_special_id=' + product_special_id,
+					dataType: 'json',
+					success: function(json) {
+
+						if(json != false) {
+							inputSpecialPriceBox.attr('name', 'product_special_id_'+json['product_special_id']);
+							inputSpecialPriceBox.val(json['price']);
+						} else {
+							inputSpecialPriceBox.parent().parent().hide();
+						}
 					}
-				}
-			});
+				});
 			}
+
+		}
 	);
 
 	$('.table-responsive').on('click', '[name ^= delete_discount_]', deleteDiscount);
-	function deleteDiscount() {
+	function deleteDiscount() { //TODO
+		if(confirm('<?php echo $text_confirm_quest ?>')) { //message
+			var product_discount_id = $(this).attr('name').replace('delete_discount_', '');
+			var button_delete = $(this);
+			$.ajax({
+				url: 'index.php?route=extension/module/massive_change_in_price_bobs/deleteDiscount&token=<?php echo $token; ?>&product_discount_id=' + product_discount_id,
+				dataType: 'json',
+				success: function (json) {
+					var context_tr = button_delete.parent().parent().parent().parent().parent().parent();
+					$('.discount_product_sub_block', context_tr).empty();
+					//context_tr.empty();
+					var discount_sub = renderDiscountHTML(json);
+					$('.discount_product_sub_block', context_tr).append(discount_sub);
 
-		var product_discount_id = $(this).attr('name').replace('delete_discount_', '');
-		var button_delete = $(this);
-		$.ajax({
-			url: 'index.php?route=extension/module/massive_change_in_price_bobs/deleteDiscount&token=<?php echo $token; ?>&product_discount_id=' + product_discount_id,
-			dataType: 'json',
-			success: function (json) {
-				var context_tr = button_delete.parent().parent().parent().parent().parent().parent();
-				$('.discount_product_sub_block', context_tr).empty();
-				//context_tr.empty();
-				var discount_sub = renderDiscountHTML(json);
-				$('.discount_product_sub_block', context_tr).append(discount_sub);
-
-			}
-		});
+				}
+			});
+		}
 	}
 
 
@@ -376,16 +417,14 @@
 
 		prefix = prefix + "_";
 		var product_id=$(this_event_call).attr('name').replace(prefix, '');
-		//alert(prefix +' as ' + product_id);
+
 		if (typeof product_id_array[product_id] != "undefined") {
-			//alert("dom : " + "[name=" + prefix + "product_" + product_id + "] ." + prefix + "product_sub_block");
+
 			var DOM_element = $("[name=" + prefix + "product_" + product_id + "] ." + prefix + "product_sub_block");
-			//alert("name :  " +DOM_element.attr('name'));
-			//alert('DOM_element ' + DOM_element);
+
 			showOrHide(product_id, DOM_element, product_id_array);
-			//alert('showOrHide, product_id ' + product_id );
+
 		} else {
-			//alert('dsfs');
 			product_id_array[product_id] = 'show';
 			switch(prefix) {
 				case 'discount_':
@@ -395,15 +434,12 @@
 					renderOptions(product_id);
 					break;
 			}
-
-			//alert('renderOptions, product_id '  + product_id);
 		}
 		hideAndShowColumn();
 	}
 
 
 	function renderDiscount(product_id) {
-		//alert('dsfs2');
 		$.ajax({
 			url: 'index.php?route=extension/module/massive_change_in_price_bobs/discount&token=<?php echo $token; ?>&product_id=' + product_id,
 			dataType: 'json',
@@ -419,7 +455,6 @@
 
 		if(json.length)
 		{
-			//alert('dsfs ' + json.length);
 			var discount = '';
 			discount +='<div class="row text-left">';
 			discount +='<div class="col-sm-4">';
@@ -432,7 +467,6 @@
 
 			discount_sub += discount;
 			for (i = 0; i < json.length; i++) {
-				////alert('555');
 
 				var discount = '';
 				discount +='<div class="row text-left">';
@@ -450,7 +484,7 @@
 				discount +='</div>';
 
 				discount_sub += discount;
-				//alert(discount);
+
 			}
 		} else {
 			discount_sub += attentionsNoDiscountHTML();
@@ -471,7 +505,7 @@
 
 
 	function renderOptions(product_id) {
-		//alert('renderOptions' + ' ' + product_id);
+
 		$.ajax({
 			url: 'index.php?route=extension/module/massive_change_in_price_bobs/options&token=<?php echo $token; ?>&product_id=' + product_id,
 			dataType: 'json',
@@ -479,9 +513,8 @@
 				var options_sub = '<div class="options_product_sub_block">';
 				if(json.length)
 				{
-					//alert('dsfs' + json);
 					for (i = 0; i < json.length; i++) {
-						//alert('555');
+
 						if(json[i]['options']) {
 							var options = '<div class="text-left"><strong>' + json[i]['name'] +": " + '</strong></div>';
 							for (isub = 0; isub < json[i]['options'].length; isub++) {
@@ -501,7 +534,7 @@
 						}
 
 						options_sub += options;
-						//alert(options);
+
 					}
 				} else {
 					options_sub += '<div class="text-left"><?php echo $attentions_no_options; ?></div>';
@@ -518,12 +551,10 @@
 			case 'show':
 				DOM_element.hide();
 				product_id_array[product_id] = 'hide';
-				//alert('DOM_element: ' +DOM_element.attr('name'));
 				break;
 			case 'hide':
 				DOM_element.show();
 				product_id_array[product_id] = 'show';
-				//alert('show: ' +product_id_options_open);
 				break;
 		}
 	}
@@ -550,8 +581,7 @@
 			var product_id = $(this).attr('name');
 			var price = $('[name = "price_' + product_id + '"]').val();
 			var price_special = $("[name ^= product_special_id_]", context_tr).val();
-			//var discount_quantity = $("[name ^= product_discount_quantity_id_]", context_tr).val();
-			//var discount_price = $("[name ^= product_discount_price_id_]", context_tr).val();
+
 			var quantity = $("[name ^= quantity_]", context_tr).val();
 
 			var status = $("[name ^= status_]", context_tr).val();
@@ -562,13 +592,9 @@
 					"=" +
 					encodeURIComponent($("[name ^= price_]", context_tr).val());
 
-
 			$("[name ^= discount_product] .form-control", context_tr).each(function(i,elem) {
 				url += '&' + $(this).attr('name') + "=" + encodeURIComponent($(this).val());
-				alert('kjh');
 			});
-
-
 
 			$("[name ^= options_product] .form-control", context_tr).each(function(i,elem) {
 				url += '&' + $(this).attr('name') + "=" + encodeURIComponent($(this).val());
@@ -585,8 +611,6 @@
 			url += "&" + $("[name ^= status_]", context_tr).attr('name') +
 			"=" +
 			encodeURIComponent($("[name ^= status_]", context_tr).val());
-			//alert('name ' +$("[name ^= quantity_]", context_tr).attr('name'));
-			//alert('val ' +$("[name ^= quantity_]", context_tr).val());
 
 			$.ajax({
 				url: 'index.php?route=extension/module/massive_change_in_price_bobs/save&token=<?php echo $token; ?>',
@@ -594,7 +618,7 @@
 				type: 'post',
 				data: url,
 				success: function(json) {
-					//alert(price+"p"+product_id);
+
 					$("[name ^= old_price_]", context_tr).text(price);
 					$("[name ^= old_special_price_]", context_tr).text(price_special);
 					$("[name ^= old_quantity_]", context_tr).text(quantity);

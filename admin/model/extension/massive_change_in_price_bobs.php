@@ -16,6 +16,15 @@ class ModelExtensionMassiveChangeInPriceBobs extends Model
         );
     }
 
+    public function setProductQuantity($product_id, $quantity)
+    {
+        $this->db->query(
+            "UPDATE " . DB_PREFIX .
+            "product SET quantity=" . (int)$quantity .
+            " WHERE product_id=" . (int)$product_id
+        );
+    }
+
     public function setProductSpecialPrice($product_special_id, $special_price)
     {
         $this->db->query(
@@ -50,15 +59,6 @@ class ModelExtensionMassiveChangeInPriceBobs extends Model
             "UPDATE " . DB_PREFIX .
             "product_option_value SET price=" . (int)$price_option .
             " WHERE product_option_value_id=" . (int)$product_option_value_id
-        );
-    }
-
-    public function setProductQuantity($product_id, $quantity)
-    {
-        $this->db->query(
-            "UPDATE " . DB_PREFIX .
-            "product SET quantity=" . (int)$quantity .
-            " WHERE product_id=" . (int)$product_id
         );
     }
 
