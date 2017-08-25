@@ -123,7 +123,7 @@
 							<input type="text" name="base_price_factor" value="<?php echo $base_price_factor; ?>" placeholder="<?php echo $help_base_price; ?>" class="form-control" />
 						</div>
 						<div class="col-sm-1">
-							<button onclick="confirm('<?php echo $text_confirm_quest; ?>') ? $('#form-base-price').submit() : false;" data-toggle="tooltip" title="<?php echo $help_base_price_button; ?>" class="btn btn-primary"><i class="fa fa-hand-o-up"></i></button>
+							<button id="base_price_button" data-toggle="tooltip" title="<?php echo $help_base_price_button; ?>" class="btn btn-primary"><i class="fa fa-hand-o-up"></i></button>
 						</div>
 						<div class="col-sm-3">
 							<span><?php echo $help_base_price; ?></span>
@@ -131,6 +131,14 @@
 					</div>
 				</div>
 			</form>
+			<script type="text/javascript">
+				$('#base_price_button').click(function(){
+					if(confirm('<?php echo $text_confirm_quest; ?>')) {
+					} else {
+						return false;
+					}
+				});
+			</script>
 			<!-- PRICE MODIFIER end -->
 
 
@@ -150,7 +158,7 @@
 							<input type="text" name="base_quantity_factor" value="<?php echo $base_quantity_factor; ?>" placeholder="<?php echo $help_base_quantity; ?>" class="form-control" />
 						</div>
 						<div class="col-sm-1">
-							<button onclick="confirm('<?php echo $text_confirm_quest; ?>') ? $('#form-base-quantity').submit() : false;"  data-toggle="tooltip" title="<?php echo $help_base_quantity_button; ?>" class="btn btn-primary"><i class="fa fa-hand-o-up"></i></button>
+							<button id="quantity_button"  data-toggle="tooltip" title="<?php echo $help_base_quantity_button; ?>" class="btn btn-primary"><i class="fa fa-hand-o-up"></i></button>
 						</div>
 						<div class="col-sm-3">
 							<span><?php echo $help_base_quantity; ?></span>
@@ -158,6 +166,14 @@
 					</div>
 				</div>
 			</form>
+			<script type="text/javascript">
+				$('#quantity_button').click(function(){
+					if(confirm('<?php echo $text_confirm_quest; ?>')) {
+					} else {
+						return false;
+					}
+				});
+			</script>
 			<!-- QUANTITY MODIFIER end -->
 
 			<form action="<?php echo $saveAll; ?>" method="post" id="form-product">
@@ -182,7 +198,7 @@
 								<?php } else { ?>
 								<a href="<?php echo $sort_price; ?>"><?php echo $column_price; ?></a>
 								<?php } ?></td>
-							<td class="text-left"><?php echo $column_category; ?></td>
+							<td class="text-left category"><?php echo $column_category; ?></td>
 							<td class="text-left"><?php echo $column_discount; ?></td>
 							<td class="text-left"><?php echo $column_options; ?></td>
 							<td class="text-right column_quantity"><?php if ($sort == 'p.quantity') { ?>
@@ -255,7 +271,7 @@
 							</td>
 
 
-							<td class="text-left">
+							<td class="text-left category">
 								<?php foreach ($categories as $category) { ?>
 								<?php if (in_array($category['category_id'], $product['category'])) { ?>
 								<?php echo $category['name'];?><br>
@@ -264,15 +280,26 @@
 
 
 							<td class="text-center" name="discount_product_<?php echo $product['product_id'] ?>">
-								<button type="button" name="discount_<?php echo $product['product_id'] ?>" data-toggle="tooltip" title="<?php echo $entry_discount_button; ?>" class="btn btn-primary discount_button"><i class="fa fa-plus-square"></i></button>
+								<?php if ($product['discount_count'] == 0) { ?>
+									<div class="text-left"><?php echo $attentions_no_discount; ?></div>
+								<?php } else { ?>
+									<button type="button" name="discount_<?php echo $product['product_id'] ?>" data-toggle="tooltip" title="<?php echo $entry_discount_button; ?>" class="btn btn-primary discount_button"><i class="fa fa-plus-square"></i></button>
+								<?php } ?>
 							</td>
+
 
 							<td class="text-center" name="options_product_<?php echo $product['product_id'] ?>">
-								<button type="button" name="options_<?php echo $product['product_id'] ?>" data-toggle="tooltip" title="<?php echo $entry_options_button; ?>" class="btn btn-primary options_button"><i class="fa fa-plus-square"></i></button>
+								<?php if ($product['options_check'] == 0) { ?>
+									<div class="text-left"><?php echo $attentions_no_options; ?></div>
+								<?php } elseif ($product['options_check'] == 1) { ?>
+									<div class="text-left"><?php echo $attentions_no_options_price; ?></div>
+								<?php } else { ?>
+									<button type="button" name="options_<?php echo $product['product_id'] ?>" data-toggle="tooltip" title="<?php echo $entry_options_button; ?>" class="btn btn-primary options_button"><i class="fa fa-plus-square"></i></button>
+								<?php } ?>
 							</td>
 
 
-							<td class="text-center column_quantity" style="width: 100px">
+							<td class="text-center column_quantity">
 								<input type="text"
 									   name="quantity_<?php echo $product['product_id'] ?>"
 									   value="<?php echo $product['quantity']; ?>"
@@ -309,10 +336,10 @@
 							</td>
 
 
-							<td class="text-right">
+							<td class="text-right" style="width: 120px">
 								<button type="button" name="<?php echo $product['product_id'] ?>" data-toggle="tooltip" title="<?php echo $entry_save; ?>" class="btn btn-primary save_button"><i class="fa fa-save"></i></button>
-								<a href="<?php echo $product['edit']; ?>" data-toggle="tooltip" title="<?php echo $entry_edit_product; ?>" class="btn btn-primary"><i class="fa fa-pencil"></i></a></td>
-
+								<a href="<?php echo $product['edit']; ?>" data-toggle="tooltip" title="<?php echo $entry_edit_product; ?>" class="btn btn-primary"><i class="fa fa-pencil"></i></a>
+							</td>
 
 						</tr>
 						<?php } ?>
@@ -332,7 +359,22 @@
 		</div>
 	</div>
 </div>
-<script type="text/javascript"><!--
+<script type="text/javascript">
+
+	$(window).resize(function () {
+		resizeWindow();
+	});
+	$(document).ready(function(){
+		resizeWindow();
+	});
+	function resizeWindow() {
+		if($('.panel-body').width()< 1230) {
+			$('.category').hide();
+		} else {
+			$('.category').show();
+		}
+	}
+
 
 	//visible old prise
 	$('.price_td [name ^= price_]:input').change(function(){
@@ -385,6 +427,7 @@
 				url: 'index.php?route=extension/module/massive_change_in_price_bobs/deleteDiscount&token=<?php echo $token; ?>&product_discount_id=' + product_discount_id,
 				dataType: 'json',
 				success: function (json) {
+					//alert(renderDiscountHTML(json));
 					var context_tr = button_delete.parent().parent().parent().parent().parent().parent();
 					$('.discount_product_sub_block', context_tr).empty();
 					//context_tr.empty();

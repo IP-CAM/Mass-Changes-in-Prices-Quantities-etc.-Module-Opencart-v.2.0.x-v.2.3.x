@@ -7,6 +7,31 @@
 class ModelExtensionMassiveChangeInPriceBobs extends Model
 {
 
+    public function getProductDiscountCount($product_id)
+    {
+        $query = $this->db->query("SELECT COUNT(*)  FROM " . DB_PREFIX . "product_discount WHERE product_id = '" . (int)$product_id . "' AND quantity > 1 AND ((date_start = '0000-00-00' OR date_start < NOW()) AND (date_end = '0000-00-00' OR date_end > NOW()))");
+        return $query->row['COUNT(*)'];
+    }
+
+    public function getOptionsCheck($product_id)
+    {
+        $query = $this->db->query("SELECT COUNT(*)  FROM " . DB_PREFIX . "product_option WHERE product_id = " . (int)$product_id);
+        if($query->row['COUNT(*)'] == 0) {
+            return 0;
+        }
+
+        $query = $this->db->query(
+            "SELECT COUNT(*)
+                FROM " . DB_PREFIX . "product_option opo
+                JOIN " . DB_PREFIX . "product_option_value oov ON opo.option_id = oov.option_id
+                WHERE opo.product_id = " . (int)$product_id . " and oov.product_id = " . (int)$product_id);
+        if($query->row['COUNT(*)'] == 0) {
+            return 1;
+        } else {
+            return $query->row['COUNT(*)'];
+        }
+    }
+
     public function setProductPrice($product_id, $price)
     {
         $this->db->query(
@@ -122,6 +147,16 @@ class ModelExtensionMassiveChangeInPriceBobs extends Model
     }
 
 
+
+    /**
+     *  Выводит только те значения скидки, которые не перекрываются,
+     * например    10шт = 30руб приоритет 1, и 10шт = 50руб приоритет 2   - выведет только первую скидку,
+     * потому что она перекрывает вторую по приоритету
+     *
+     * @param $product_id
+     *
+     * @return array
+     */
     public function getProductDiscount($product_id)
     {
 
@@ -137,13 +172,12 @@ class ModelExtensionMassiveChangeInPriceBobs extends Model
                 {
                     if($discount_table['priority'] >= $discount_norm_value['priority'])
                     {
-                        $check = 1;
-                        continue;
+                        //skip the value
                     } else {
-                        $discount_norm[$key] = $discount_norm_value; //Update
-                        $check = 1;
-                        continue;
+                        $discount_norm[$key] = $discount_norm_value; //Update value
                     }
+                    $check = 1;
+                    continue;
                 }
             }
             if($check) {

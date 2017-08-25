@@ -4,7 +4,7 @@ $_['text_module']      = 'Модули';
 $_['heading_title']       	  = 'Массовое изменение цены м-ра Бобса';
 
 // Column
-$_['column_name']          			= 'Название категории';
+$_['column_name']          			= 'Название товара';
 $_['column_sort_order']          	= 'Порядок сортировки';
 $_['column_discount']          	= 'Скидки от количества';
 $_['column_action']          		= 'Действие';
