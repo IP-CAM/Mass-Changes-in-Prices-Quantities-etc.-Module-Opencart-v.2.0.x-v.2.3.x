@@ -26,6 +26,7 @@ $_['entry_options_button']          	= 'Показать опции продук
 $_['entry_discount_button']          	= 'Показать скидки на количество';
 $_['entry_delete_discount']          	= 'Удалить скидку';
 $_['entry_delete_special']          	= 'Удалить акцию';
+$_['text_final_price']          	= 'Цена с учетом налогов и акций: ';
 
 
 $_['success_update']          			= 'Цены сохранены';
@@ -44,7 +45,24 @@ $_['help_base_quantity']          	= 'Изменить количество то
 $_['help_base_quantity_button']          	= 'Изменения сразу вступят в силу';
 
 $_['text_confirm_quest']          	= 'Изменения сразу вступят в силу. Вы уверены?';
+$_['text_warning_selected_products_zero']          	= 'Пожалуйста, выберете продукты';
 
+$_['without_taxes']          	= 'Без налогов';
 
+$_['help_base_activate_button']          	= 'Активировать все выбранные продукты';
+$_['help_base_deactivate_button']          	= 'Деактивировать все выбранные продукты';
+$_['help_base_tax_button']          	= 'Применять налог для всех существующих продуктов';
+$_['help_base_delete_sp_price_button']          	= 'Удалить цены по акции для всех выбранных продуктов';
+$_['help_base_delete_discount_button']          	= 'Удалить скидки для всех выбранных продуктов';
+$_['help_views_product']          	= 'Посмотреть продукт на сайте';
+
+$_['base_activate_button']          	= 'Активировать';
+$_['base_deactivate_button']          	= 'Деактивировать';
+$_['base_tax_button']          	= 'Налог для всех продуктов представленных на сайте';
+$_['base_delete_sp_price_button']          	= 'Удалить цены по акции';
+$_['base_delete_discount_button']          	= 'Удалить скидки';
+
+//message
+$_['info_yes_base']          	= 'Изменения успешно сохранены';
 
 ?>

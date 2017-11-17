@@ -58,6 +58,23 @@ class ModelExtensionChangeInPriceBobs extends Model
             " WHERE product_special_id=" . (int)$product_special_id
         );
     }
+    public function deleteProductSpecialPriceFromPrId($product_id)
+    {
+        $this->db->query(
+            "DELETE FROM " . DB_PREFIX .
+            "product_special " .
+            " WHERE product_id=" . (int)$product_id
+        );
+    }
+
+    public function deleteProductDiscountFromPrId($product_id)
+    {
+        $this->db->query(
+            "DELETE FROM " . DB_PREFIX .
+            "product_discount " .
+            " WHERE product_id=" . (int)$product_id
+        );
+    }
 
     public function setProductDiscountQuantity($product_discount_id, $discount_quantity)
     {
@@ -95,6 +112,15 @@ class ModelExtensionChangeInPriceBobs extends Model
             " WHERE product_id=" . (int)$product_id
         );
     }
+
+    public function setProductTaxClass($tax_class_id) //No selected, accept for all products
+    {
+        $this->db->query(
+            "UPDATE " . DB_PREFIX .
+            "product SET tax_class_id=" . (int)$tax_class_id
+        );
+    }
+
 
     public function getProductIdBySpecial($product_special_id)
     {
@@ -148,6 +174,8 @@ class ModelExtensionChangeInPriceBobs extends Model
 
 
 
+
+
     /**
      *  Выводит только те значения скидки, которые не перекрываются,
      * например    10шт = 30руб приоритет 1, и 10шт = 50руб приоритет 2   - выведет только первую скидку,
@@ -187,6 +215,23 @@ class ModelExtensionChangeInPriceBobs extends Model
         }
 
         return $discount_norm;
+    }
+
+
+    public function getUrlProduct($product_id)
+    {
+        $product_id = 'product_id=' . $product_id;
+        $sql = $this->db->query(
+            "SELECT keyword FROM " . DB_PREFIX .
+            "url_alias " .
+            " WHERE query='" . $this->db->escape($product_id) . "'"
+        );
+        if(isset($sql->row['keyword'])) {
+            return $sql->row['keyword'];
+        } else {
+            return null;
+        }
+
     }
 
 }

@@ -107,11 +107,12 @@
 			</div>
 
 
-			<!-- PRICE MODIFIER -->
-			<form action="<?php echo $basePrice; ?>" method="post" id="form-base-price">
+
+			<form action="<?php echo $baseModifierTerminal; ?>" method="post" id="form-base-modifier-terminal">
+				<!-- PRICE MODIFIER -->
 				<div class="well">
 					<div class="row form-group">
-						<div class="col-sm-1">
+						<div class="col-sm-3 col-md-1 col-lg-1">
 							<select name="base_price_factor_prefix" class="form-control">
 								<option value="+" <?php if($base_price_factor_prefix == '+') { ?> selected="selected" <?php } ?>>+</option>
 								<option value="-" <?php if($base_price_factor_prefix == '-') { ?> selected="selected" <?php } ?>>-</option>
@@ -119,34 +120,24 @@
 								<option value="=" <?php if($base_price_factor_prefix == '=') { ?> selected="selected" <?php } ?>>=</option>
 							</select>
 						</div>
-						<div class="col-sm-7">
+						<div class="col-sm-3 col-md-7 col-lg-7">
 							<input type="text" name="base_price_factor" value="<?php echo $base_price_factor; ?>" placeholder="<?php echo $help_base_price; ?>" class="form-control" />
 						</div>
-						<div class="col-sm-1">
-							<button id="base_price_button" data-toggle="tooltip" title="<?php echo $help_base_price_button; ?>" class="btn btn-primary"><i class="fa fa-hand-o-up"></i></button>
+						<div class="col-sm-1 col-md-1 col-lg-1">
+							<button id="base_price_button" name="base_price_button" data-toggle="tooltip" title="<?php echo $help_base_price_button; ?>" class="btn btn-primary"><i class="fa fa-hand-o-up"></i></button>
 						</div>
-						<div class="col-sm-3">
+						<div class="col-sm-5 col-md-3 col-lg-3">
 							<span><?php echo $help_base_price; ?></span>
 						</div>
 					</div>
 				</div>
-			</form>
-			<script type="text/javascript">
-				$('#base_price_button').click(function(){
-					if(confirm('<?php echo $text_confirm_quest; ?>')) {
-					} else {
-						return false;
-					}
-				});
-			</script>
-			<!-- PRICE MODIFIER end -->
+				<!-- PRICE MODIFIER end -->
 
 
-			<!-- QUANTITY MODIFIER -->
-			<form action="<?php echo $baseQuantity; ?>" method="post" id="form-base-quantity">
+				<!-- QUANTITY MODIFIER -->
 				<div class="well">
 					<div class="row form-group">
-						<div class="col-sm-1">
+						<div class="col-sm-3 col-md-1 col-lg-1">
 							<select name="base_quantity_factor_prefix" class="form-control">
 								<option value="+" <?php if($base_quantity_factor_prefix == '+') { ?> selected="selected" <?php } ?>>+</option>
 								<option value="-" <?php if($base_quantity_factor_prefix == '-') { ?> selected="selected" <?php } ?>>-</option>
@@ -154,27 +145,75 @@
 								<option value="=" <?php if($base_quantity_factor_prefix == '=') { ?> selected="selected" <?php } ?>>=</option>
 							</select>
 						</div>
-						<div class="col-sm-7">
+						<div class="col-sm-3 col-md-7 col-lg-7">
 							<input type="text" name="base_quantity_factor" value="<?php echo $base_quantity_factor; ?>" placeholder="<?php echo $help_base_quantity; ?>" class="form-control" />
 						</div>
-						<div class="col-sm-1">
-							<button id="quantity_button"  data-toggle="tooltip" title="<?php echo $help_base_quantity_button; ?>" class="btn btn-primary"><i class="fa fa-hand-o-up"></i></button>
+						<div class="col-sm-1 col-md-1 col-lg-1">
+							<button id="quantity_button" name="quantity_button" data-toggle="tooltip" title="<?php echo $help_base_quantity_button; ?>" class="btn btn-primary"><i class="fa fa-hand-o-up"></i></button>
 						</div>
-						<div class="col-sm-3">
+						<div class="col-sm-5 col-md-3 col-lg-3">
 							<span><?php echo $help_base_quantity; ?></span>
 						</div>
 					</div>
 				</div>
+				<!-- QUANTITY MODIFIER end-->
+
+				<!-- OTHER MODIFIER -->
+				<div class="well">
+
+					<div class="row form-group">
+						<div class="col-sm-12 col-md-12 col-lg-12">
+							<div class="col-sm-6">
+								<button title="<?php echo $help_base_activate_button; ?>" name="base_activate_button" class="btn pull-left btn-success ">
+									<i class="fa fa-power-off"></i> <?php echo $base_activate_button; ?>
+								</button>
+							</div>
+							<div class="col-sm-6">
+								<button title="<?php echo $help_base_deactivate_button; ?>" name="base_deactivate_button" class="btn pull-left btn-danger">
+									<i class="fa fa-power-off"></i> <?php echo $base_deactivate_button; ?>
+								</button>
+							</div>
+						</div>
+					</div>
+
+					<div class="row form-group">
+						<div class="col-sm-12 col-md-12 col-lg-12">
+							<div class="col-sm-6">
+								<button title="<?php echo $help_base_delete_discount_button; ?>" name="base_delete_discount_button" class="btn btn-danger pull-left">
+									<i class="fa fa-trash-o"></i> <?php echo $base_delete_discount_button; ?>
+								</button>
+							</div>
+							<div class="col-sm-6">
+								<button title="<?php echo $help_base_delete_sp_price_button; ?>" name="base_delete_sp_price_button" class="btn btn-danger pull-left">
+									<i class="fa fa-trash-o"></i> <?php echo $base_delete_sp_price_button; ?>
+								</button>
+							</div>
+						</div>
+					</div>
+
+				</div>
+				<div class="well">
+					<div class="row form-group">
+						<div class="col-sm-12 col-md-12 col-lg-12">
+							<div class="col-sm-6">
+								<select name="base_tax" class="form-control col-sm-8">
+									<?php foreach ($tax_name as $key=>$title) { ?>
+									<option value="<?php echo $key ?>"><?php echo $title ?></option>
+									<?php } ?>
+								</select>
+							</div>
+							<div class="col-sm-6">
+								<button title="<?php echo $help_base_tax_button; ?>" name="base_tax_button" class="btn btn-success pull-left">
+									<i class="fa fa-tachometer"></i> <?php echo $base_tax_button; ?>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- OTHER MODIFIER end-->
+
 			</form>
-			<script type="text/javascript">
-				$('#quantity_button').click(function(){
-					if(confirm('<?php echo $text_confirm_quest; ?>')) {
-					} else {
-						return false;
-					}
-				});
-			</script>
-			<!-- QUANTITY MODIFIER end -->
+
 
 
 			<form action="<?php echo $saveAll; ?>" method="post" id="form-product">
@@ -183,6 +222,9 @@
 					<table class="table table-bordered table-hover">
 						<thead>
 						<tr>
+							<td style="width: 1px;" class="text-center">
+								<input type="checkbox" onclick="$('input[name*=\'selected\']').prop('checked', this.checked);">
+							</td>
 							<td class="text-center"><?php echo $column_image; ?></td>
 							<td class="text-left"><?php if ($sort == 'pd.name') { ?>
 								<a href="<?php echo $sort_name; ?>" class="<?php echo strtolower($order); ?>"><?php echo $column_name; ?></a>
@@ -220,6 +262,9 @@
 						<?php foreach ($products as $product) { ?>
 						<tr>
 
+							<td class="text-center">
+								<input type="checkbox" name="selected_id_product[]" value="<?php echo $product['product_id'] ?>">
+							</td>
 
 							<td class="text-center"><?php if ($product['image']) { ?>
 								<img src="<?php echo $product['image']; ?>" alt="<?php echo $product['name']; ?>" class="img-thumbnail" />
@@ -278,6 +323,9 @@
 									</span>
 								</div>
 								<?php } ?>
+
+								<span class="price_final">
+									<?php echo $text_final_price; ?><?php echo $product['price_final']; ?></span>
 							</td>
 
 
@@ -339,8 +387,8 @@
 
 
 							<td class="text-right" style="width: 120px">
-								<button type="button" name="<?php echo $product['product_id'] ?>" data-toggle="tooltip" title="<?php echo $entry_save; ?>" class="btn btn-primary save_button"><i class="fa fa-save"></i></button>
-								<a href="<?php echo $product['edit']; ?>" data-toggle="tooltip" title="<?php echo $entry_edit_product; ?>" class="btn btn-primary"><i class="fa fa-pencil"></i></a>
+								<a href="<?php echo $product['view']; ?>" target="_blank" data-toggle="tooltip" title="<?php echo $help_views_product; ?>" class="btn btn-primary"><i class="fa fa-eye"></i></a>
+								<a href="<?php echo $product['edit']; ?>" target="_blank" data-toggle="tooltip" title="<?php echo $entry_edit_product; ?>" class="btn btn-primary"><i class="fa fa-pencil"></i></a>
 							</td>
 
 						</tr>
@@ -624,66 +672,7 @@
 	}
 
 
-	$('.save_button').click(function()
-		{
 
-			var url = "";
-			var context_tr = $(this).parent().parent();
-
-			var product_id = $(this).attr('name');
-			var price = $('[name = "price_' + product_id + '"]').val();
-			var price_special = $("[name ^= product_special_id_]", context_tr).val();
-
-			var quantity = $("[name ^= quantity_]", context_tr).val();
-
-			var status = $("[name ^= status_]", context_tr).val();
-
-
-			//gather date
-			url += $("[name ^= price_]", context_tr).attr('name') +
-					"=" +
-					encodeURIComponent($("[name ^= price_]", context_tr).val());
-
-			$("[name ^= discount_product] .form-control", context_tr).each(function(i,elem) {
-				url += '&' + $(this).attr('name') + "=" + encodeURIComponent($(this).val());
-			});
-
-			$("[name ^= options_product] .form-control", context_tr).each(function(i,elem) {
-				url += '&' + $(this).attr('name') + "=" + encodeURIComponent($(this).val());
-			});
-
-			$("[name ^= product_special_id_]", context_tr).each(function(i,elem) {
-				url += '&' + $(this).attr('name') + "=" + encodeURIComponent($(this).val());
-			});
-
-			url += "&" + $("[name ^= quantity_]", context_tr).attr('name') +
-			"=" +
-			encodeURIComponent($("[name ^= quantity_]", context_tr).val());
-
-			url += "&" + $("[name ^= status_]", context_tr).attr('name') +
-			"=" +
-			encodeURIComponent($("[name ^= status_]", context_tr).val());
-
-			$.ajax({
-				url: 'index.php?route=extension/module/change_in_price_bobs/save&token=<?php echo $token; ?>',
-				dataType: 'json',
-				type: 'post',
-				data: url,
-				success: function(json) {
-
-					$("[name ^= old_price_]", context_tr).text(price);
-					$("[name ^= old_special_price_]", context_tr).text(price_special);
-					$("[name ^= old_quantity_]", context_tr).text(quantity);
-					$("[name ^= old_status_]", context_tr).text(status);
-
-					$(".old_price", context_tr).hide();
-					$(".old_special_price", context_tr).hide();
-					$(".old_quantity", context_tr).hide();
-					$(".old_status", context_tr).hide();
-				}
-			});
-		}
-	);
 	//--></script>
 
 <script type="text/javascript"><!--
@@ -776,5 +765,42 @@
 			$('input[name=\'filter_model\']').val(item['label']);
 		}
 	});
+
+	//FOR BASE CHANDE
+	$('[name = \'base_price_button\'], ' +
+	'[name = \'quantity_button\'], ' +
+	'[name = \'base_activate_button\'], ' +
+	'[name = \'base_deactivate_button\'], ' +
+	'[name =\'base_delete_discount_button\'],  ' +
+	'[name = \'base_delete_sp_price_button\']  ' ).click(function() {
+
+		var arraySp =[];
+		$("[name ^= selected_id_product]:checked").each(function() {
+			arraySp.push($(this).val());
+		});
+		if(arraySp.length) {
+			if(confirm('<?php echo $text_confirm_quest; ?>')) {
+				var stringMas_selected_id_product = JSON.stringify(arraySp);
+				$(this).append('<input type="hidden" name="selected_id_products_ar" value= ' + stringMas_selected_id_product + ' / >');
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			alert('<?php echo $text_warning_selected_products_zero; ?>');
+			return false;
+		}
+
+	});
+
+	$('[name = \'base_tax_button\'] ').click(function() {
+		if(confirm('<?php echo $text_confirm_quest; ?>')) {
+			return true;
+		} else {
+			return false;
+		}
+	});
+
+
 	//--></script></div>
 <?php echo $footer; ?>

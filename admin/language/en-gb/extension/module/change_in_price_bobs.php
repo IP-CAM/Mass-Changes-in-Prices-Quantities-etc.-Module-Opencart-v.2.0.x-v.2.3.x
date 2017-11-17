@@ -26,6 +26,7 @@ $_['entry_options_button']          	= 'Show product options';
 $_['entry_discount_button']          	= 'Show discounts for quantity';
 $_['entry_delete_discount']          	= 'Delete discount';
 $_['entry_delete_special']          	= 'Delete share';
+$_['text_final_price']          	= 'Price including taxes and shares:';
 
 
 $_['success_update']          			= 'Prices are saved';
@@ -44,7 +45,26 @@ $_['help_base_quantity']          	= 'To change the number of items in the selec
 $_['help_base_quantity_button']          	= 'Changes will immediately take effect';
 
 $_['text_confirm_quest']          	= 'Changes will immediately take effect. Are you sure?';
+$_['text_warning_selected_products_zero']          	= 'Please select products';
 
+$_['without_taxes']          	= 'Without taxes';
+
+
+$_['help_base_activate_button']          	= 'Activate all selected products';
+$_['help_base_deactivate_button']          	= 'Deactivate all selected products';
+$_['help_base_tax_button']          	= 'Apply tax for all selected products';
+$_['help_base_delete_sp_price_button']          	= 'Remove stock prices for all selected products';
+$_['help_base_delete_discount_button']          	= 'Remove discounts for all selected products';
+$_['help_views_product']          	= 'View product on the website';
+
+$_['base_activate_button']          	= 'Activate';
+$_['base_deactivate_button']          	= 'Deactive';
+$_['base_tax_button']          	= 'Tax for all products';
+$_['base_delete_sp_price_button']          	= 'Remove stock prices';
+$_['base_delete_discount_button']          	= 'Remove discounts';
+
+//message
+$_['info_yes_base']          	= 'Changes successfully saved.';
 
 
 ?>
